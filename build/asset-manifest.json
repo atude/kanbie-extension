@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/static/css/main.27b8e987.chunk.css",
+    "main.js": "/static/js/main.cdc4071e.chunk.js",
+    "main.js.map": "/static/js/main.cdc4071e.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.aa6001eb.js",
+    "runtime-main.js.map": "/static/js/runtime-main.aa6001eb.js.map",
+    "static/js/2.7c3dd62f.chunk.js": "/static/js/2.7c3dd62f.chunk.js",
+    "static/js/2.7c3dd62f.chunk.js.map": "/static/js/2.7c3dd62f.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.44234ece57b3c8aa4b6f4357680f12f9.js": "/precache-manifest.44234ece57b3c8aa4b6f4357680f12f9.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.27b8e987.chunk.css.map": "/static/css/main.27b8e987.chunk.css.map",
+    "static/js/2.7c3dd62f.chunk.js.LICENSE.txt": "/static/js/2.7c3dd62f.chunk.js.LICENSE.txt",
+    "static/media/kanbie-logo.svg": "/static/media/kanbie-logo.0ec7d911.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.aa6001eb.js",
+    "static/js/2.7c3dd62f.chunk.js",
+    "static/css/main.27b8e987.chunk.css",
+    "static/js/main.cdc4071e.chunk.js"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+	"name": "document.contains",
+	"version": "1.0.1",
+	"description": "Polyfill/shim for `document.contains`",
+	"main": "index.js",
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "es-shim-api --bound",
+		"posttest": "npx aud"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ljharb/document.contains.git"
+	},
+	"keywords": [
+		"contains",
+		"document",
+		"element",
+		"node",
+		"polyfill",
+		"shim"
+	],
+	"author": "Jordan Harband <ljharb@gmail.com>",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/ljharb/document.contains/issues"
+	},
+	"homepage": "https://github.com/ljharb/document.contains#readme",
+	"devDependencies": {
+		"@es-shims/api": "^2.1.2",
+		"@ljharb/eslint-config": "^13.1.1",
+		"eslint": "^5.15.1"
+	},
+	"dependencies": {
+		"define-properties": "^1.1.3"
+	}
+}

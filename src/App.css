@@ -1,0 +1,133 @@
+/*Custom scrollbar*/
+::-webkit-scrollbar {
+  position: absolute;
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #202020;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #400033; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ed39c9; 
+}
+
+body {
+  overflow-x: hidden;
+  width: 700px;
+  height: 520px;
+  font-family: 'Roboto', sans-serif;
+  background-color: #202020;
+  font-size: medium;
+}
+
+.kanbie-logo {
+  margin: -10px;
+  padding-top: 3px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: center;
+}
+
+.header {
+  text-align: center;
+  font-size: 20px;
+  padding: 20px;
+  color: #ed39c9;
+  font-weight: 200;
+}
+
+.main-container {
+  display: flex;
+  justify-content: center;
+  height: 500px;
+}
+
+.column-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+}
+
+.column-heading {
+  color: #fff;
+  margin: 4px;
+  padding-left: 4px;
+  padding-top: 2px;
+  padding-bottom: 12px;
+}
+
+.droppable-container {
+  width: 200px;
+  border-radius: 10px;
+  padding: 10px;
+  margin-left: 4px;
+  margin-right: 4px;
+  box-shadow: 1px 1px 4px #000000;
+  margin-bottom: 20px;
+}
+
+.draggable-card {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  box-shadow: 1px 1px 4px #000000;
+  color: white;
+  font-size: smaller;
+  word-break: break-word;
+}
+
+.delete-icon {
+  margin-bottom: -5px;
+  margin-left: -2px;
+}
+
+.add-icon {
+  margin-top: -1px;
+  margin-left: -2px;
+}
+
+.add-button-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 12px;
+  width: 20px;
+  height: 20px;
+}
+
+.add-button-container:not(:hover) {
+  background-color: #400033;
+  transition: all 0.1s;
+}
+
+.add-button-container:active {
+  transform: scale(0.9);
+}
+
+.add-button-container:hover {
+  background-color: #61074e;
+  transition: all 0.1s;
+}
+
+.input-add {
+  outline: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: smaller;
+  background-color: #272727;
+  min-height: 80px;
+  color: #fff;
+  border-color: #020101;
+  border-radius: 10px;
+  padding: 10px;
+  margin-left: 4px;
+  margin-right: 4px;
+  box-shadow: 1px 1px 4px #000000;
+}
