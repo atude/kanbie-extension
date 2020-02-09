@@ -23,8 +23,9 @@ function App() {
 
   useEffect(() => {
     const getColumns = localStorage.getItem("columns");
+    console.log(getColumns);
 
-    if(!getColumns) {
+    if(!getColumns || getColumns === "undefined") {
       setColumns(initColumns);
     } else {
       setColumns(JSON.parse(getColumns));
@@ -80,7 +81,6 @@ function App() {
 
   const handleClickAdd = () => {
     setInput(true);
-
   }
 
   const onAddCard = (e) => {
@@ -90,7 +90,10 @@ function App() {
         content: inputText
       });
 
+      console.log(columns);
+
       setInput(false);
+      saveColumns(columns);
     }
 
     return;
