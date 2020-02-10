@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
@@ -15,6 +16,13 @@ import OutsideClickHandler from 'react-outside-click-handler';
 
 const maxItems = 5;
 
+const delCol = "#802626";
+const delActiveCol = "#9b2e2e";
+const cardBgCol = "#3f4447";
+const cardBgActiveCol = "#434b4f";
+const columnBgColor = "#2f3437";
+const columnBorderColor = "#9b2e85";
+
 function App() {
   const [columns, setColumns] = useState();
   const [isInput, setInput] = useState(false);
@@ -22,20 +30,30 @@ function App() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const getColumns = localStorage.getItem("columns");
-    console.log(getColumns);
+    let getColumns;
+    chrome.storage.sync.get("columns", function(data) {
+      if (!chrome.runtime.error) {
+        getColumns = data.columns;
+      }
 
-    if(!getColumns || getColumns === "undefined") {
-      setColumns(initColumns);
-    } else {
-      setColumns(JSON.parse(getColumns));
-    }
-
-    setLoaded(true);
+      if(!getColumns || getColumns === "undefined") {
+        setColumns(initColumns);
+      } else {
+        setColumns(getColumns);
+      }
+  
+      setLoaded(true);
+    });
   }, []);
 
   const saveColumns = (columns) => {
-    localStorage.setItem("columns", JSON.stringify(columns));
+    chrome.storage.sync.set({
+      "columns": columns
+    }, function() {
+      if (chrome.runtime.error) {
+        console.log("Runtime error. Failed to save data");
+      }
+    });
   }
 
   const onDragEnd = (result) => {
@@ -131,14 +149,16 @@ function App() {
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     style={{
-                      background: snapshot.isDraggingOver ? "#400033" : "#121212",
+                      borderColor: columnBorderColor,
+                      borderWidth: snapshot.isDraggingOver ? "2px" : 0,
+                      borderStyle: "solid",
+                      backgroundColor: columnBgColor,
                       minHeight: "400px",
                       paddingTop: "50px",
                       marginTop: "-62px"
                     }}
                     className="droppable-container"
                   > 
-                    
                     {column.items.map((item, i) => (
                       <Draggable key={item.id} draggableId={item.content + item.id} index={i}>
                         {(provided, snapshot) => (
@@ -148,7 +168,7 @@ function App() {
                             ref={provided.innerRef}
                             style={{
                               userSelect: 'none',
-                              backgroundColor: snapshot.isDragging ? "#272727" : "#1a1a1a",
+                              backgroundColor: snapshot.isDragging ? cardBgActiveCol : cardBgCol,
                               ...provided.draggableProps.style
                             }}
                             className="draggable-card"
@@ -170,7 +190,7 @@ function App() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 style={{
-                  background: snapshot.isDraggingOver ? "#6e0000" : "#3d0000",
+                  background: snapshot.isDraggingOver ? delActiveCol : delCol,
                   width: "20px",
                   position: "absolute",
                   top: 0,

@@ -5,11 +5,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #202020;
+  background: #25292b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #400033; 
+  background: #680b54; 
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -21,7 +21,7 @@ body {
   width: 700px;
   height: 520px;
   font-family: 'Roboto', sans-serif;
-  background-color: #202020;
+  background-color: #25292b;
   font-size: medium;
 }
 
@@ -70,15 +70,16 @@ body {
   padding: 10px;
   margin-left: 4px;
   margin-right: 4px;
-  box-shadow: 1px 1px 4px #000000;
+  box-shadow: 1px 1px 4px #1e2123;
   margin-bottom: 20px;
+  transition: all 0.2s;
 }
 
 .draggable-card {
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 8px;
-  box-shadow: 1px 1px 4px #000000;
+  box-shadow: 1px 1px 4px #25292b;
   color: white;
   font-size: smaller;
   word-break: break-word;
@@ -104,7 +105,7 @@ body {
 }
 
 .add-button-container:not(:hover) {
-  background-color: #400033;
+  background-color: #80266e;
   transition: all 0.1s;
 }
 
@@ -113,7 +114,7 @@ body {
 }
 
 .add-button-container:hover {
-  background-color: #61074e;
+  background-color: #9b2e85;
   transition: all 0.1s;
 }
 
@@ -121,13 +122,13 @@ body {
   outline: none;
   font-family: 'Roboto', sans-serif;
   font-size: smaller;
-  background-color: #272727;
+  background-color: #25292b;
   min-height: 80px;
   color: #fff;
-  border-color: #020101;
+  border-color: #9b2e85;
   border-radius: 10px;
   padding: 10px;
   margin-left: 4px;
   margin-right: 4px;
-  box-shadow: 1px 1px 4px #000000;
+  box-shadow: 1px 1px 4px #25292b;
 }
