@@ -14,7 +14,7 @@ import KanbieLogo from './assets/kanbie-logo.svg';
 import uuid from 'uuid';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-const maxItems = 5;
+const maxItems = 10;
 
 const delCol = "#802626";
 const delActiveCol = "#9b2e2e";
@@ -43,6 +43,13 @@ function App() {
       }
   
       setLoaded(true);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        handleClickAdd();
+        setInputText("");
+      }
     });
   }, []);
 
@@ -98,7 +105,9 @@ function App() {
   )
 
   const handleClickAdd = () => {
-    setInput(true);
+    if(!isInput) {
+      setInput(true);
+    }
   }
 
   const onAddCard = (e) => {
@@ -107,8 +116,6 @@ function App() {
         id: uuid(),
         content: inputText
       });
-
-      console.log(columns);
 
       setInput(false);
       saveColumns(columns);

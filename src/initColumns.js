@@ -8,7 +8,7 @@ const initColumns = [
       },
       {
         id: "t2",
-        content: "Press the add button to create a new task. When you're done typing, press enter to add it to your to-do list."
+        content: "Click the add button (or press space anywhere) to create a new task. When you're done typing, press enter to add it to your to-do list."
       },
     ]
   },
