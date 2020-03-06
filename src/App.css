@@ -75,6 +75,21 @@ body {
   transition: all 0.2s;
 }
 
+.droppable-trash {
+  width: 20px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 12px;
+}
+
+.column-container {
+  min-height: 400px;
+  padding-top: 50px;
+  margin-top: -62px;
+  border-style: solid;
+}
+
 .draggable-card {
   padding: 12px;
   border-radius: 10px;
@@ -104,13 +119,14 @@ body {
   height: 20px;
 }
 
-.add-button-container:not(:hover) {
-  background-color: #80266e;
-  transition: all 0.1s;
-}
 
 .add-button-container:active {
   transform: scale(0.9);
+}
+
+.add-button-container:not(:hover) {
+  background-color: #80266e;
+  transition: all 0.1s;
 }
 
 .add-button-container:hover {
@@ -118,17 +134,83 @@ body {
   transition: all 0.1s;
 }
 
+.labels-button-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 12px;
+  margin-left: 60px;
+  width: 20px;
+  height: 20px;
+}
+
+.labels-button-container:active {
+  transform: scale(0.9);
+}
+
+.labels-button-container:not(:hover) {
+  background-color: #80266e;
+  transition: all 0.1s;
+}
+
+.labels-button-container:hover {
+  background-color: #9b2e85;
+  transition: all 0.1s;
+}
+
 .input-add {
-  outline: none;
+  background-color: #25292b;
+  margin-top: 10px;
+  min-height: 100px;
+  border-radius: 10px;
+  min-width: 220px;
+}
+
+.labels-list {
+  background-color: #25292b;
+  margin-top: 10px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.label-item {
+  
+}
+
+ /* --> Styles required from react-mentions */
+ .mentions__control {
   font-family: 'Roboto', sans-serif;
   font-size: smaller;
-  background-color: #25292b;
-  min-height: 80px;
-  color: #fff;
-  border-color: #9b2e85;
-  border-radius: 10px;
-  padding: 10px;
   margin-left: 4px;
   margin-right: 4px;
+}
+.mentions__highlighter {
+  border: 1px solid transparent;
+  padding: 8px;
+  width: 100%;
+  overflow-wrap: normal !important;
+  white-space: pre-wrap;
+  outline: none;
+}
+.mentions__input {
+  border: 1px solid silver;
+  border-color: #9b2e85;
   box-shadow: 1px 1px 4px #25292b;
+  border-radius: 10px;
+  padding: 8px;
+  outline: none;
+  color: #fff;
+}
+.mentions__suggestions__list {
+  background-color: #25292b;
+  box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.4);
+}
+.mentions__suggestions__item {
+  padding: 5px 10px;
+  color: #fff;
+  font-size: smaller;
+}
+.mentions__suggestions__item--focused {
+  background-color: #333;
 }
