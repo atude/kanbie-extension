@@ -12,7 +12,8 @@ import {
   cardBgActiveCol, 
   cardBgCol, 
   delActiveCol, 
-  delCol 
+  delCol,
+  colorPanelColors
 } from './constants/Colors';
 import { MentionsInput, Mention } from 'react-mentions'
 
@@ -224,12 +225,14 @@ function App() {
             </span>
             <span className="label-item-action-container">
               <FormatColorFillIcon 
-                onClick={() => console.log("change col")} 
+                onClick={() => shiftLabelColor(label.id)} 
                 style={{color: "grey", marginTop: "6px"}}
+                className="button-icon"
               />
               <CloseIcon 
                 onClick={() => deleteLabel(label.id)} 
                 style={{color: "grey"}}
+                className="button-icon"
               />
             </span>
           </div>
@@ -241,6 +244,16 @@ function App() {
   const deleteLabel = (labelId) => {
     const remainingLabels = [...labels].filter(label => label.id !== labelId);
     setLabels(remainingLabels);
+  }
+
+  const shiftLabelColor = (labelId) => {
+    const labelsCopy = [...labels];
+    const labelIndex = labelsCopy.findIndex(label => label.id === labelId);
+    labelsCopy[labelIndex].color = colorPanelColors[
+      colorPanelColors.findIndex(panelColor => panelColor === labelsCopy[labelIndex].color)
+    + 1] || colorPanelColors[0];
+
+    setLabels(labelsCopy);
   }
 
   const onAddCard = (e) => {
@@ -261,7 +274,7 @@ function App() {
       labels.push({
         id: uuid(),
         display: labelText,
-        color: "#33b5e5"
+        color: colorPanelColors[Math.floor(Math.random() * colorPanelColors.length)]
       });
 
       setLabelText("");

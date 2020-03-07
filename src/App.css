@@ -110,6 +110,14 @@ body {
   margin-left: -2px;
 }
 
+.button-icon {
+  transform: scale(1);
+}
+
+.button-icon:active {
+  transform: scale(0.9);
+}
+
 .add-button-container {
   position: absolute;
   top: 0;
@@ -190,11 +198,13 @@ body {
   width: max-content;
   border-radius: 10px;
   transform: none;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .label-item {
   font-size: smaller;
-  margin: 4px 2px;
+  margin: 4px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -243,7 +253,8 @@ body {
   margin-top: 4px;
   margin-right: 3px;
   border-radius: 10px;
-  padding: 2px 6px;
+  padding: 3px 6px;
+  font-size: small;
 }
 
 .label-input {
