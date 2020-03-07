@@ -35,22 +35,9 @@ const columnIconProps = {
   style: { marginBottom: "8px" }
 };
 
-const labelsData = [
-  { 
-    display: "impactio", 
-    id: "yes",
-    color: "#33b5e5"
-  }, 
-  { 
-    display: "wsdgwe", 
-    id: "wdwqd",
-    color: "#33b5e5"
-  }
-];
-
 function App() {
   const [columns, setColumns] = useState(initColumns);
-  const [labels, setLabels] = useState(labelsData);
+  const [labels, setLabels] = useState([]);
   const [currLabels, setCurrLabels] = useState({});
   const [inputExpanded, setInputExpanded] = useState(false);
   const [inputText, setInputText] = useState("");
