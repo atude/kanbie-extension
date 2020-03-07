@@ -119,7 +119,6 @@ body {
   height: 20px;
 }
 
-
 .add-button-container:active {
   transform: scale(0.9);
 }
@@ -158,35 +157,107 @@ body {
   transition: all 0.1s;
 }
 
+.input-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-left: 10px;
+  margin-top: 60px;
+  border: 2px solid #9b2e85;
+  box-shadow: 1px 1px 4px #25292b;
+  background-color: #25292b;
+  border-radius: 10px;
+}
+
 .input-add {
   background-color: #25292b;
-  margin-top: 10px;
   min-height: 100px;
   border-radius: 10px;
-  min-width: 220px;
+  width: 220px;
 }
 
 .labels-list {
+  position: absolute;
+  top: 0;
+  left: 0;
   background-color: #25292b;
-  margin-top: 10px;
+  padding: 2px;
+  border: 2px solid #9b2e85;
+  margin-top: 60px;
+  margin-left: 60px;
+  padding: 8px;
   color: #fff;
-  display: flex;
-  flex-direction: column;
+  width: max-content;
+  border-radius: 10px;
+  transform: none;
 }
 
 .label-item {
-  
+  font-size: smaller;
+  margin: 4px 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label-item-text {
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.label-item-action-container {
+  padding-left: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.curr-labels-container {
+  border-top: 1px solid #2f3437;
+  padding: 8px 4px;
+  margin-top: 2px;
+  color: #fff;
+  font-size: small;
+  display: flex;
+  flex-direction: row;
+}
+
+.curr-label-item {
+  padding: 2px 6px;
+  margin: 0 2px;
+  border-radius: 10px;
+}
+
+.card-label-container {
+  padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin: -3px;
+  margin-right: -6px;
+}
+
+.card-label-item {
+  margin-top: 4px;
+  margin-right: 3px;
+  border-radius: 10px;
+  padding: 2px 6px;
+}
+
+.label-input {
+  border: 1px solid #333;
 }
 
  /* --> Styles required from react-mentions */
- .mentions__control {
+.mentions__control {
   font-family: 'Roboto', sans-serif;
   font-size: smaller;
   margin-left: 4px;
   margin-right: 4px;
 }
 .mentions__highlighter {
-  border: 1px solid transparent;
   padding: 8px;
   width: 100%;
   overflow-wrap: normal !important;
@@ -194,10 +265,8 @@ body {
   outline: none;
 }
 .mentions__input {
-  border: 1px solid silver;
-  border-color: #9b2e85;
-  box-shadow: 1px 1px 4px #25292b;
-  border-radius: 10px;
+  border: none;
+  outline: none;
   padding: 8px;
   outline: none;
   color: #fff;
