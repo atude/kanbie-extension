@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Kanbie",
   "description": "Kanbie - Simple Kanban for Chrome",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "browser_action": {
     "default_popup": "index.html"
   },

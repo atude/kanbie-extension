@@ -109,6 +109,12 @@ function App() {
     } else if (e.code === "KeyL" && !labelsListExpanded && !inputExpanded) {
       setLabelsListExpanded(!labelsListExpanded);
       setTimeout(() => setLabelText(""), 0);
+    } else if (e.code === "Backspace") {
+      if(labelsListExpanded && labelText === "") {
+        setLabelsListExpanded(!labelsListExpanded);
+      } else if (inputExpanded && inputText === "") {
+        setInputExpanded(!inputExpanded);
+      }
     }
   };
 
@@ -245,11 +251,13 @@ function App() {
 
   const onAddCard = (e) => {
     if(e.key === "Enter" && inputText !== "") {
-      columns[0].items.push({
+      const columnsCopy = [...columns];
+      columnsCopy[0].items.push({
         id: uuid(),
         content: inputText
       });
 
+      setColumns(columnsCopy);
       setInputExpanded(false);
       setInputText("");
       setCurrLabels({});
