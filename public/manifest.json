@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Kanbie",
-  "description": "Kanbie - Simple Kanban for Chrome",
-  "version": "1.2.2",
+  "description": "Dark themed kanban board from any tab.",
+  "version": "1.2.3",
   "browser_action": {
     "default_popup": "index.html"
   },
@@ -13,5 +13,15 @@
   },
   "permissions": [
     "storage"
-  ]
+  ],
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "windows": "Alt+K",
+        "mac": "Alt+K",
+        "chromeos": "Alt+K",
+        "linux": "Alt+K"
+      }
+    }
+  }
 }
