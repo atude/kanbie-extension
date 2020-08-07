@@ -9,11 +9,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #680b54; 
+  background: #1e2123; 
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ed39c9; 
+  background: #680b54; 
 }
 
 body {
@@ -46,7 +46,7 @@ body {
 .main-container {
   display: flex;
   justify-content: center;
-  height: 500px;
+  height: 1000px;
 }
 
 .column-header-container {
@@ -79,8 +79,40 @@ body {
   width: 20px;
   position: absolute;
   top: 0;
+  right: 50px;
+  margin: 12px;
+}
+
+.droppable-clear-all {
+  width: 20px;
+  position: absolute;
+  top: 0;
   right: 0;
   margin: 12px;
+  background-color: #1e2123;
+}
+
+.droppable-clear-all:hover {
+  background-color: #9b2e2e;
+}
+
+.delete-me-text {
+  height: 0;
+  width: 0;
+  opacity: 0;
+  color: #fff;
+  position: absolute;
+  margin-top: -20px;
+  margin-left: 120px;
+  overflow: hidden;
+}
+
+.transitioner {
+  display: inherit;
+  width: 100px;
+  height: auto;
+  opacity: 1;
+  transition: opacity 0.35s ease-in;
 }
 
 .column-container {
@@ -104,6 +136,12 @@ body {
   margin-bottom: -5px;
   margin-left: -2px;
 }
+
+.delete-all-icon {
+  margin-bottom: -5px;
+  margin-left: -2px;
+}
+
 
 .add-icon {
   margin-top: -1px;

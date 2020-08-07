@@ -26,6 +26,7 @@ import PlusIcon from 'mdi-react/PlusIcon';
 import LabelMultipleIcon from 'mdi-react/LabelMultipleIcon';
 import CloseIcon from 'mdi-react/CloseIcon';
 import FormatColorFillIcon from 'mdi-react/FormatColorFillIcon';
+import NotificationClearAllIcon from 'mdi-react/NotificationClearAllIcon';
 
 const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
@@ -80,6 +81,7 @@ function App() {
   }, []);  
 
   useEffect(() => {
+    console.log(columns);
     try {
       chrome.storage.sync.set({
         "columns": columns,
@@ -144,6 +146,14 @@ function App() {
       }
     }
 
+    setColumns(currColumns);
+  }
+
+  // Clear all from done
+  const onDeleteAllDone = () => {
+    const currColumns = [...columns];
+    const sourceItems = currColumns[2].items;
+    sourceItems.splice(0, sourceItems.length);
     setColumns(currColumns);
   }
 
@@ -214,7 +224,7 @@ function App() {
               className="label-item-text" 
               style={{backgroundColor: label.color}}
             >
-                {label.display}
+              {label.display}
             </span>
             <span className="label-item-action-container">
               <FormatColorFillIcon 
@@ -368,15 +378,29 @@ function App() {
                 ref={provided.innerRef}
                 style={{
                   background: snapshot.isDraggingOver ? delActiveCol : delCol,
-
+                  width: snapshot.isDraggingOver ? "200px" : "20px"
                 }}
                 className="droppable-container droppable-trash"
               > 
                 <DeleteForeverIcon color="#fff" className="delete-icon"/>
+                <span 
+                  className={`delete-me-text ${snapshot.isDraggingOver ? "transitioner" : ""}`}
+                >
+                  Delete me!
+                </span>
               </div>
             )}  
           </Droppable>
         </DragDropContext>
+        <div
+          // style={{
+          //   background: snapshot.isDraggingOver ? delActiveCol : delCol,
+          // }}
+          className="droppable-container droppable-clear-all button-icon"
+          onClick={() => onDeleteAllDone()}
+        > 
+          <NotificationClearAllIcon color="#fff" className="delete-all-icon"/>
+        </div>
         <div 
           className="add-button-container droppable-container"
           onClick={() => setInputExpanded(!inputExpanded)}
