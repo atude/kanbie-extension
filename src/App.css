@@ -215,11 +215,25 @@ body {
   border-radius: 10px;
 }
 
+.input-container-inplace {
+  margin-bottom: 8px;
+  border: 2px solid #9b2e85;
+  box-shadow: 1px 1px 4px #25292b;
+  background-color: #25292b;
+  border-radius: 10px;
+}
+
 .input-add {
   background-color: #25292b;
   min-height: 100px;
   border-radius: 10px;
   width: 220px;
+}
+
+.input-add-inplace {
+  background-color: #25292b;
+  border-radius: 10px;
+  width: 100%;
 }
 
 .labels-list {

@@ -45,6 +45,21 @@ function App() {
   const [labelsListExpanded, setLabelsListExpanded] = useState(false);
   const [labelText, setLabelText] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [isEditingId, setEditingId] = useState();
+  const [startedEditing, setStartedEditing] = useState(false);
+
+  const setEditing = (item) => {
+    setEditingId(item.id);
+    setInputText(item.content);
+  }
+
+  const saveAndResetEditing = () => {
+    onEditTask();
+    setEditingId();
+    setInputText("");
+    setCurrLabels({});
+    setStartedEditing(false);
+  }
 
   // Load data
   useEffect(() => {
@@ -60,7 +75,6 @@ function App() {
           setColumns(getColumns);
         }
       });
-
       chrome.storage.sync.get("labels", function(data) {
         if (!chrome.runtime.error) {
           getLabels = data.labels;
@@ -70,18 +84,16 @@ function App() {
           setLabels(getLabels);
         }
       });
-
       setLoaded(true);
     } catch (error) {
       console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
       setLoaded(true);
     }
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);  
 
   useEffect(() => {
-    console.log(columns);
+    // console.log(columns);
     try {
       chrome.storage.sync.set({
         "columns": columns,
@@ -98,20 +110,19 @@ function App() {
 
   useEffect(() => {
     document.addEventListener("keydown", keyShortcutHandler);
-
     return () => {
       document.removeEventListener('keydown', keyShortcutHandler);
     };
   });
 
   const keyShortcutHandler = (e) => {
-    if (e.code === "Space" && !labelsListExpanded && !inputExpanded) {
+    if (e.code === "Space" && !labelsListExpanded && !inputExpanded && !isEditingId) {
       setInputExpanded(!inputExpanded);
       setTimeout(() => setInputText(""), 0);
-    } else if (e.code === "KeyL" && !labelsListExpanded && !inputExpanded) {
+    } else if (e.code === "KeyL" && !labelsListExpanded && !inputExpanded && !isEditingId) {
       setLabelsListExpanded(!labelsListExpanded);
       setTimeout(() => setLabelText(""), 0);
-    } else if (e.code === "Backspace") {
+    } else if (e.code === "Backspace" && !isEditingId) {
       if(labelsListExpanded && labelText === "") {
         setLabelsListExpanded(!labelsListExpanded);
       } else if (inputExpanded && inputText === "") {
@@ -123,16 +134,16 @@ function App() {
   const onDragEnd = (result) => {
     const { source, destination } = result;
     const currColumns = [...columns];
-
-    if(!destination) return;
-
-    //Delete
-    if(destination.droppableId === "trash") {
+    if (!destination) {
+      return;
+    }
+    // Delete
+    if (destination.droppableId === "trash") {
       const sourceItems = currColumns.filter((column => column.title === source.droppableId))[0].items;
       sourceItems.splice(source.index, 1);
     } else {
-      //Different column
-      if(source.droppableId !== destination.droppableId) {
+      // Different column
+      if (source.droppableId !== destination.droppableId) {
         const sourceItems = currColumns.filter((column => column.title === source.droppableId))[0].items;
         const destItems = currColumns.filter((column => column.title === destination.droppableId))[0].items;
         if(destItems.length >= maxItems) return;
@@ -156,6 +167,27 @@ function App() {
     sourceItems.splice(0, sourceItems.length);
     setColumns(currColumns);
   }
+
+  const onEditTask = () => {
+    const currColumns = columns
+      .map(x => ({ ...x }))
+      .map(column => {
+        return {
+          ...column,
+          items: column.items.map(task => {
+            if (task.id === isEditingId) {
+              // Edited task
+              return {
+                ...task,
+                content: inputText,
+              };
+            }
+            return task;
+          }),
+        }
+      });
+    setColumns(currColumns);
+  };
 
   const addCurrLabel = (id, display) => {
     setCurrLabels({...currLabels, [id]: display});
@@ -210,12 +242,16 @@ function App() {
       <div className="labels-list">
         <input 
           className="mentions__input"
-          style={{backgroundColor: "transparent"}}
+          type="text"
+          pattern="[a-zA-Z0-9\s]+"
+          style={{ backgroundColor: "transparent" }}
           placeholder="Add label..."
           maxLength={24}
           autoFocus
           value={labelText}
-          onChange={e => setLabelText(e.target.value)}
+          // Dont allow brackets since its needed for label puller
+          // eslint-disable-next-line no-useless-escape
+          onChange={e => setLabelText(e.target.value.replace(/[\[\]\(\)]/g, ""))}
           onKeyDown={e => onAddLabel(e)}
         />
         {labels.map(label => (
@@ -260,7 +296,7 @@ function App() {
   }
 
   const onAddCard = (e) => {
-    if(e.key === "Enter" && inputText !== "") {
+    if (e.key === "Enter" && inputText.replace(/\s/g, '') !== "") {
       const columnsCopy = [...columns];
       columnsCopy[0].items.push({
         id: uuid(),
@@ -271,6 +307,12 @@ function App() {
       setInputExpanded(false);
       setInputText("");
       setCurrLabels({});
+    }
+  }
+
+  const onEditCard = (e) => {
+    if (e.key === "Enter" && inputText.replace(/\s/g, '') !== "") {
+      saveAndResetEditing();
     }
   }
 
@@ -288,7 +330,9 @@ function App() {
 
   const getLabelsFromCard = (cardText) => {
     const filteredLabels = cardText.match(labelRegex);
-    if(!filteredLabels) return;
+    if (!filteredLabels) {
+      return;
+    }
 
     return (
       <div className="card-label-container">
@@ -345,26 +389,94 @@ function App() {
                     }}
                     className="droppable-container column-container"
                   > 
-                    {column.items.map((item, i) => (
-                      <Draggable key={item.id} draggableId={item.content + item.id} index={i}>
-                        {(provided, snapshot) => (
-                          <div 
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                            style={{
-                              userSelect: 'none',
-                              backgroundColor: snapshot.isDragging ? cardBgActiveCol : cardBgCol,
-                              ...provided.draggableProps.style
-                            }}
-                            className="draggable-card"
+                    {column.items.map((item, i) => {
+                      if (isEditingId === item.id) {
+                        if (!startedEditing) {
+                          const itemLabels = {};
+                          const itemLabelsRaw = item.content.match(labelRegex);
+                          const itemLabelIds = itemLabelsRaw?.map(label => label.match(/\(.*\)/)[0].slice(1, -1))
+                          if (itemLabelIds?.length) {
+                            itemLabelIds.reverse().forEach((labelId) => {
+                              itemLabels[labelId] = labels.find((lbl) => lbl.id === labelId).display
+                            });
+                          }
+                          console.log("HERE")
+                          console.log(itemLabelIds, itemLabels);
+                          console.log("END")
+
+                          setCurrLabels(itemLabels ?? {});
+                          setStartedEditing(true);
+                        }
+                        return (
+                          <OutsideClickHandler 
+                            key={item.id}
+                            onOutsideClick={() => saveAndResetEditing()}
                           >
-                            {item.content.replace(labelRegex, '')}
-                            {getLabelsFromCard(item.content)}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
+                            <div className="input-container-inplace">
+                              <MentionsInput 
+                                value={inputText} 
+                                onChange={e => setInputText(e.target.value)}
+                                placeholder="Edit task..."
+                                className="mentions input-add-inplace"
+                                onKeyDown={e => onEditCard(e)}
+                                autoFocus
+                                maxLength={100}
+                                allowSpaceInQuery
+                              >
+                                <Mention
+                                  className="mentions__mention"
+                                  trigger="#"
+                                  data={labels.filter((label => !currLabels[label.id]))}
+                                  displayTransform={() => ""}
+                                  onAdd={(id, display) => addCurrLabel(id, display)}
+                                />
+                              </MentionsInput>
+                              {!!Object.values(currLabels).length && 
+                                <div className="curr-labels-container">
+                                  {Object.keys(currLabels).map((keyLabel, i) => (
+                                    <span 
+                                      className="curr-label-item"
+                                      style={{backgroundColor: labels.find(label => label.id === keyLabel).color}}
+                                      key={keyLabel}
+                                    >
+                                      {currLabels[keyLabel]}
+                                    </span>
+                                  ))}
+                                </div>
+                              }
+                            </div>
+                          </OutsideClickHandler>
+                          // <textarea
+                          //   value={editingContent}
+                          //   onChange={(e) => setEditingContent(e.target.value)}
+                          //   className="draggable-card-editing"
+                          //   maxLength={100}
+                          // />
+                        );
+                      } else {
+                        return (
+                          <Draggable key={item.id} draggableId={item.content + item.id} index={i}>
+                            {(provided, snapshot) => (
+                              <div 
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                ref={provided.innerRef}
+                                style={{
+                                  userSelect: 'none',
+                                  backgroundColor: snapshot.isDragging ? cardBgActiveCol : cardBgCol,
+                                  ...provided.draggableProps.style
+                                }}
+                                className="draggable-card"
+                                onDoubleClick={() => setEditing(item)}
+                              >
+                                {item.content.replace(labelRegex, '')}
+                                {getLabelsFromCard(item.content)}
+                              </div>
+                            )}
+                          </Draggable>
+                        );
+                      }
+                    })}
                     {provided.placeholder}
                   </div>
                 )}
