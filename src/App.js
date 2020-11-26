@@ -1,4 +1,17 @@
 /*global chrome*/
+
+/* 
+
+  TODO
+
+  - Refactor -> abstract functions, components, etx
+  - Clean up styles, use scss or variables, remove unused styles
+  - Fix up mutations -> make sure functions are not mutating/using ref instead of copy
+  - Use reducers to clean up logic
+  - Convert to TS
+
+*/
+
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
@@ -27,6 +40,7 @@ import LabelMultipleIcon from 'mdi-react/LabelMultipleIcon';
 import CloseIcon from 'mdi-react/CloseIcon';
 import FormatColorFillIcon from 'mdi-react/FormatColorFillIcon';
 import NotificationClearAllIcon from 'mdi-react/NotificationClearAllIcon';
+import { filterString } from './utils';
 
 const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
@@ -55,6 +69,14 @@ function App() {
 
   const saveAndResetEditing = () => {
     onEditTask();
+    setEditingId();
+    setInputText("");
+    setCurrLabels({});
+    setStartedEditing(false);
+  }
+
+  const saveAndResetEditingHeader = () => {
+    onEditHeader();
     setEditingId();
     setInputText("");
     setCurrLabels({});
@@ -146,7 +168,9 @@ function App() {
       if (source.droppableId !== destination.droppableId) {
         const sourceItems = currColumns.filter((column => column.title === source.droppableId))[0].items;
         const destItems = currColumns.filter((column => column.title === destination.droppableId))[0].items;
-        if(destItems.length >= maxItems) return;
+        if (destItems.length >= maxItems) {
+          return;
+        }
         const [removed] = sourceItems.splice(source.index, 1);
         destItems.splice(destination.index, 0, removed);
       } else {
@@ -176,15 +200,32 @@ function App() {
           ...column,
           items: column.items.map(task => {
             if (task.id === isEditingId) {
-              // Edited task
-              return {
-                ...task,
-                content: inputText,
-              };
+              if (inputText) {
+                return {
+                  ...task,
+                  content: inputText,
+                };
+              }
+              return undefined;
             }
             return task;
-          }),
+          }).filter(task => task !== undefined),
         }
+      });
+    setColumns(currColumns);
+  };
+
+  const onEditHeader = () => {
+    const currColumns = columns
+      .map(x => ({ ...x }))
+      .map(column => {
+        if (column.title === isEditingId) {
+          return {
+            ...column,
+            newTitle: inputText ?? "",
+          }
+        }
+        return column;
       });
     setColumns(currColumns);
   };
@@ -222,7 +263,7 @@ function App() {
         </MentionsInput>
         {!!Object.values(currLabels).length && 
           <div className="curr-labels-container">
-            {Object.keys(currLabels).map((keyLabel, i) => (
+            {Object.keys(currLabels).map((keyLabel) => (
               <span 
                 className="curr-label-item"
                 style={{backgroundColor: labels.find(label => label.id === keyLabel).color}}
@@ -296,7 +337,7 @@ function App() {
   }
 
   const onAddCard = (e) => {
-    if (e.key === "Enter" && inputText.replace(/\s/g, '') !== "") {
+    if (e.key === "Enter" && filterString(inputText) !== "") {
       const columnsCopy = [...columns];
       columnsCopy[0].items.push({
         id: uuid(),
@@ -310,11 +351,17 @@ function App() {
     }
   }
 
-  const onEditCard = (e) => {
-    if (e.key === "Enter" && inputText.replace(/\s/g, '') !== "") {
+  const onKeypressEditCard = (e) => {
+    if (e.key === "Enter" && filterString(inputText) !== "") {
       saveAndResetEditing();
     }
   }
+
+  const onKeypressEditHeader = (e) => {
+    if (e.key === "Enter" && filterString(inputText) !== "") {
+      saveAndResetEditingHeader();
+    }
+  };
 
   const onAddLabel = (e) => {
     if(e.key === "Enter" && labelText !== "") {
@@ -369,13 +416,34 @@ function App() {
         <DragDropContext
           onDragEnd={onDragEnd}
         >
-          {columns.map(column => (
+          {columns.map((column, colNum) => (
             <div key={column.title}>
               <div className="column-header-container">
-                <div className="column-heading">{column.title}</div>
-                {column.title === "To-do" && <CheckboxMarkedCircleOutlineIcon {...columnIconProps}/>}
-                {column.title === "Doing" && <ProgressCheckIcon {...columnIconProps}/>}
-                {column.title === "Done" && <CheckboxMarkedCircleIcon {...columnIconProps}/>}
+                {(isEditingId === column.title) ? (
+                  <OutsideClickHandler onOutsideClick={() => saveAndResetEditingHeader()}>
+                    <input 
+                      className="column-heading-editing"
+                      autoFocus
+                      onKeyDown={e => onKeypressEditHeader(e)}
+                      onChange={e => setInputText(e.target.value)}
+                      value={inputText}
+                      maxLength={14}
+                    />
+                  </OutsideClickHandler>
+                ) : (
+                  <div 
+                    className="column-heading"
+                    onDoubleClick={() => {
+                      setInputText(column.newTitle || column.title);
+                      setEditingId(column.title);
+                    }}
+                  >
+                    {column?.newTitle || column.title}
+                  </div>
+                )}
+                {colNum === 0 && <CheckboxMarkedCircleOutlineIcon {...columnIconProps}/>}
+                {colNum === 1 && <ProgressCheckIcon {...columnIconProps}/>}
+                {colNum === 2 && <CheckboxMarkedCircleIcon {...columnIconProps}/>}
               </div>
               <Droppable droppableId={column.title}>
                 {(provided, snapshot) => (
@@ -400,10 +468,6 @@ function App() {
                               itemLabels[labelId] = labels.find((lbl) => lbl.id === labelId).display
                             });
                           }
-                          console.log("HERE")
-                          console.log(itemLabelIds, itemLabels);
-                          console.log("END")
-
                           setCurrLabels(itemLabels ?? {});
                           setStartedEditing(true);
                         }
@@ -418,7 +482,7 @@ function App() {
                                 onChange={e => setInputText(e.target.value)}
                                 placeholder="Edit task..."
                                 className="mentions input-add-inplace"
-                                onKeyDown={e => onEditCard(e)}
+                                onKeyDown={e => onKeypressEditCard(e)}
                                 autoFocus
                                 maxLength={100}
                                 allowSpaceInQuery
@@ -446,12 +510,6 @@ function App() {
                               }
                             </div>
                           </OutsideClickHandler>
-                          // <textarea
-                          //   value={editingContent}
-                          //   onChange={(e) => setEditingContent(e.target.value)}
-                          //   className="draggable-card-editing"
-                          //   maxLength={100}
-                          // />
                         );
                       } else {
                         return (
@@ -505,9 +563,6 @@ function App() {
           </Droppable>
         </DragDropContext>
         <div
-          // style={{
-          //   background: snapshot.isDraggingOver ? delActiveCol : delCol,
-          // }}
           className="droppable-container droppable-clear-all button-icon"
           onClick={() => onDeleteAllDone()}
         > 

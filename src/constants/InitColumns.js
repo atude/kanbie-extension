@@ -18,7 +18,12 @@ const initColumns = [
   },
   {
     title: "Doing",
-    items: []
+    items: [
+      {
+        id: "t4",
+        content: "🖱️ Double click a task or header to edit."
+      },
+    ]
   },
   {
     title: "Done",

@@ -62,6 +62,20 @@ body {
   padding-left: 4px;
   padding-top: 2px;
   padding-bottom: 12px;
+  overflow: hidden;
+  text-overflow: clip;
+  max-width: 160px;
+}
+
+.column-heading-editing {
+  color: #fff;
+  padding-left: 4px;
+  margin-bottom: 10px;
+  border: 2px solid #9b2e85;
+  box-shadow: 1px 1px 4px #25292b;
+  background-color: #25292b;
+  border-radius: 4px;
+  outline: none;
 }
 
 .droppable-container {
