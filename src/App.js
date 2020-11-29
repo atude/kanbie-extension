@@ -4,6 +4,10 @@
 
   TODO
 
+  - Add themes
+ 
+  MAINTENANCE
+
   - Refactor -> abstract functions, components, etx
   - Clean up styles, use scss or variables, remove unused styles
   - Fix up mutations -> make sure functions are not mutating/using ref instead of copy
@@ -14,6 +18,7 @@
 
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import './Settings.css';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import initColumns from './constants/InitColumns';
@@ -40,8 +45,10 @@ import LabelMultipleIcon from 'mdi-react/LabelMultipleIcon';
 import CloseIcon from 'mdi-react/CloseIcon';
 import FormatColorFillIcon from 'mdi-react/FormatColorFillIcon';
 import NotificationClearAllIcon from 'mdi-react/NotificationClearAllIcon';
+import CogIcon from 'mdi-react/CogIcon';
 import { filterString } from './utils';
 
+const currYear = new Date().getFullYear();
 const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
 const columnIconProps = {
@@ -61,11 +68,12 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [isEditingId, setEditingId] = useState();
   const [startedEditing, setStartedEditing] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const setEditing = (item) => {
     setEditingId(item.id);
     setInputText(item.content);
-  }
+  };
 
   const saveAndResetEditing = () => {
     onEditTask();
@@ -73,7 +81,7 @@ function App() {
     setInputText("");
     setCurrLabels({});
     setStartedEditing(false);
-  }
+  };
 
   const saveAndResetEditingHeader = () => {
     onEditHeader();
@@ -81,7 +89,7 @@ function App() {
     setInputText("");
     setCurrLabels({});
     setStartedEditing(false);
-  }
+  };
 
   // Load data
   useEffect(() => {
@@ -138,10 +146,10 @@ function App() {
   });
 
   const keyShortcutHandler = (e) => {
-    if (e.code === "Space" && !labelsListExpanded && !inputExpanded && !isEditingId) {
+    if (e.code === "Space" && !labelsListExpanded && !inputExpanded && !isEditingId && !showSettings) {
       setInputExpanded(!inputExpanded);
       setTimeout(() => setInputText(""), 0);
-    } else if (e.code === "KeyL" && !labelsListExpanded && !inputExpanded && !isEditingId) {
+    } else if (e.code === "KeyL" && !labelsListExpanded && !inputExpanded && !isEditingId && !showSettings) {
       setLabelsListExpanded(!labelsListExpanded);
       setTimeout(() => setLabelText(""), 0);
     } else if (e.code === "Backspace" && !isEditingId) {
@@ -150,6 +158,8 @@ function App() {
       } else if (inputExpanded && inputText === "") {
         setInputExpanded(!inputExpanded);
       }
+    } else if (e.code === "KeyS" && !labelsListExpanded && !inputExpanded && !isEditingId) {
+      setShowSettings((currSettings) => !currSettings);
     }
   };
 
@@ -182,7 +192,7 @@ function App() {
     }
 
     setColumns(currColumns);
-  }
+  };
 
   // Clear all from done
   const onDeleteAllDone = () => {
@@ -190,7 +200,7 @@ function App() {
     const sourceItems = currColumns[2].items;
     sourceItems.splice(0, sourceItems.length);
     setColumns(currColumns);
-  }
+  };
 
   const onEditTask = () => {
     const currColumns = columns
@@ -232,7 +242,7 @@ function App() {
 
   const addCurrLabel = (id, display) => {
     setCurrLabels({...currLabels, [id]: display});
-  }
+  };
 
   const renderInputBox = () => (
     <OutsideClickHandler 
@@ -276,7 +286,7 @@ function App() {
         }
       </div>
     </OutsideClickHandler>
-  )
+  );
 
   const renderLabelsList = () => (
     <OutsideClickHandler onOutsideClick={() => setLabelsListExpanded(!labelsListExpanded)}>
@@ -295,8 +305,8 @@ function App() {
           onChange={e => setLabelText(e.target.value.replace(/[\[\]\(\)]/g, ""))}
           onKeyDown={e => onAddLabel(e)}
         />
-        {labels.map(label => (
-          <div className="label-item"> 
+        {labels.map((label) => (
+          <div className="label-item" key={label.id}> 
             <span 
               className="label-item-text" 
               style={{backgroundColor: label.color}}
@@ -319,12 +329,56 @@ function App() {
         ))}
       </div>
     </OutsideClickHandler>
-  )
+  );
+
+  const renderSettings = () => (
+    <div className="settings-container">
+      <div className="settings-content-container">
+        <div className="header-container">
+          <img alt="logo" src={KanbieLogo} width={60} className="kanbie-logo"/>
+          <div className="header settings-header">
+            kanbie
+          </div>
+        </div>
+        <div className="close-button" onClick={() => setShowSettings(false)}>
+          <CloseIcon color={delCol} size={30}/>
+        </div>
+        <span className="copyright-header">atude (Mozamel Anwary) © {currYear}</span>
+        <div className="settings-shortcuts-container">
+          <p className="shortcuts-header">Shortcuts</p>
+          <div className="shortcut-item">
+            <span><i>alt+k / opt+k</i></span>
+            <span>Open Kanbie</span>
+          </div>
+          <div className="shortcut-item">
+            <span><i>space</i></span>
+            <span>Create a new task</span>
+          </div>
+          <div className="shortcut-item">
+            <span><i>l</i></span>
+            <span>Create a new label</span>
+          </div>
+          <div className="shortcut-item">
+            <span><i>s</i></span>
+            <span>Open/close settings</span>
+          </div>
+          <div className="shortcut-item">
+            <span><i>#</i></span>
+            <span>Add a label to a task (when creating/editing task)</span>
+          </div>
+          <div className="shortcut-item">
+            <span><i>double click</i></span>
+            <span>Edit task or column header</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const deleteLabel = (labelId) => {
     const remainingLabels = [...labels].filter(label => label.id !== labelId);
     setLabels(remainingLabels);
-  }
+  };
 
   const shiftLabelColor = (labelId) => {
     const labelsCopy = [...labels];
@@ -334,7 +388,7 @@ function App() {
     + 1] || colorPanelColors[0];
 
     setLabels(labelsCopy);
-  }
+  };
 
   const onAddCard = (e) => {
     if (e.key === "Enter" && filterString(inputText) !== "") {
@@ -349,13 +403,13 @@ function App() {
       setInputText("");
       setCurrLabels({});
     }
-  }
+  };
 
   const onKeypressEditCard = (e) => {
     if (e.key === "Enter" && filterString(inputText) !== "") {
       saveAndResetEditing();
     }
-  }
+  };
 
   const onKeypressEditHeader = (e) => {
     if (e.key === "Enter" && filterString(inputText) !== "") {
@@ -574,15 +628,21 @@ function App() {
         >
           <PlusIcon color="#fff" className="add-icon"/>
         </div>
-        
         <div 
           className="labels-button-container droppable-container"
           onClick={() => setLabelsListExpanded(!labelsListExpanded)}
         >
           <LabelMultipleIcon color="#fff" className="add-icon"/>
         </div>
+        <div 
+          className="settings-button-container droppable-container"
+          onClick={() => setShowSettings(true)}
+        >
+          <CogIcon color="#fff" className="add-icon"/>
+        </div>
         {!!inputExpanded && renderInputBox()}
         {!!labelsListExpanded && renderLabelsList()}
+        {!!showSettings && renderSettings()}
       </div>
       }
     </div>

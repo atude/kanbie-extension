@@ -1,0 +1,57 @@
+.settings-container {
+  position: absolute;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  width: 700px;
+  height: 1200px;
+  color: #fff;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.settings-content-container {
+  text-align: center;
+  padding: 20px 10px;
+  color: #fff;
+}
+
+.settings-shortcuts-container {
+  text-align: left;
+  width: 500px;
+}
+
+.shortcut-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.shortcuts-header {
+  font-size: 20px;
+  color: #ed39c9;
+}
+
+.copyright-header {
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+.settings-header {
+  font-size: 30px;
+}
+
+.close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 42px;
+  transform: scale(1);
+  cursor: pointer;
+}
+
+.close-button:active {
+  transform: scale(0.9);
+}

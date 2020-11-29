@@ -108,6 +108,7 @@ body {
 
 .droppable-clear-all:hover {
   background-color: #9b2e2e;
+  cursor: pointer;
 }
 
 .delete-me-text {
@@ -191,6 +192,7 @@ body {
 .add-button-container:hover {
   background-color: #9b2e85;
   transition: all 0.1s;
+  cursor: pointer;
 }
 
 .labels-button-container {
@@ -215,7 +217,34 @@ body {
 .labels-button-container:hover {
   background-color: #9b2e85;
   transition: all 0.1s;
+  cursor: pointer;
 }
+
+.settings-button-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 12px;
+  margin-left: 108px;
+  width: 20px;
+  height: 20px;
+}
+
+.settings-button-container:active {
+  transform: scale(0.9);
+}
+
+.settings-button-container:not(:hover) {
+  background-color: #80266e;
+  transition: all 0.1s;
+}
+
+.settings-button-container:hover {
+  background-color: #9b2e85;
+  transition: all 0.1s;
+  cursor: pointer;
+}
+
 
 .input-container {
   position: absolute;
