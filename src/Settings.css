@@ -16,9 +16,27 @@
   color: #fff;
 }
 
-.settings-shortcuts-container {
+.settings-shortcuts-container, 
+.settings-themes-container,
+.settings-hidelogo-container {
   text-align: left;
   width: 500px;
+}
+
+.settings-select-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: 5px;
+}
+
+.select-item {
+  cursor: pointer;
+}
+
+.select-item-selected {
+  border-bottom: 2px solid var(--accentColoredBright);
 }
 
 .shortcut-item {
@@ -29,9 +47,9 @@
   margin-bottom: 5px;
 }
 
-.shortcuts-header {
+.settings-subheader {
   font-size: 20px;
-  color: #ed39c9;
+  color: var(--accentColoredBright);
 }
 
 .copyright-header {

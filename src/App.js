@@ -22,17 +22,11 @@ import './Settings.css';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import initColumns from './constants/InitColumns';
+import initSettings from './constants/InitSettings';
+
 import uuid from 'uuid';
 import OutsideClickHandler from 'react-outside-click-handler';
-import { 
-  columnBorderColor, 
-  columnBgColor, 
-  cardBgActiveCol, 
-  cardBgCol, 
-  delActiveCol, 
-  delCol,
-  colorPanelColors
-} from './constants/Colors';
+import { themes } from './constants/Colors';
 import { MentionsInput, Mention } from 'react-mentions'
 
 import KanbieLogo from './assets/kanbie-logo.svg';
@@ -51,15 +45,12 @@ import { filterString } from './utils';
 const currYear = new Date().getFullYear();
 const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
-const columnIconProps = {
-  size: 24,
-  color: "#fff",
-  style: { marginBottom: "8px" }
-};
+
 
 function App() {
   const [columns, setColumns] = useState(initColumns);
   const [labels, setLabels] = useState([]);
+  const [settings, setSettings] = useState(initSettings);
   const [currLabels, setCurrLabels] = useState({});
   const [inputExpanded, setInputExpanded] = useState(false);
   const [inputText, setInputText] = useState("");
@@ -69,6 +60,93 @@ function App() {
   const [isEditingId, setEditingId] = useState();
   const [startedEditing, setStartedEditing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Load data
+  useEffect(() => {
+    let getColumns;
+    let getLabels;
+    let getSettings;
+    try {
+      chrome.storage.sync.get("columns", function(data) {
+        if (!chrome.runtime.error) {
+          getColumns = data.columns;
+        }
+  
+        if (getColumns && getColumns !== "undefined") {
+          setColumns(getColumns);
+        }
+      });
+      chrome.storage.sync.get("labels", function(data) {
+        if (!chrome.runtime.error) {
+          getLabels = data.labels;
+        }
+  
+        if (getLabels && getLabels !== "undefined") {
+          setLabels(getLabels);
+        }
+      });
+      chrome.storage.sync.get("settings", function(data) {
+        if (!chrome.runtime.error) {
+          getSettings = data.settings;
+        }
+  
+        if (getSettings && getSettings !== "undefined") {
+          setSettings(getSettings);
+        }
+      });
+      setLoaded(true);
+    } catch (error) {
+      console.warn("Error syncing with chrome API. Are you using this as a webapp?");
+      setLoaded(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);  
+
+  const theme = settings?.theme ? themes[settings?.theme] : themes.dark;
+  const columnIconProps = {
+    size: 24,
+    color: theme.accent,
+    style: { marginBottom: "8px" }
+  };
+
+  // Set CSS theme variables
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--bg1', theme.background);
+    root.style.setProperty('--bg2', theme.backgroundSecondary);
+    root.style.setProperty('--bg3', theme.backgroundGrey);
+    root.style.setProperty('--accent', theme.accent);
+    root.style.setProperty('--accentColored', theme.accentColored);
+    root.style.setProperty('--accentColoredBright', theme.accentColoredBright);
+    root.style.setProperty('--accentColoredDark', theme.accentColoredDark);
+    root.style.setProperty('--accentDelete', theme.delCol);
+    root.style.setProperty('--shadow', theme.shadow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+
+  useEffect(() => {
+    // console.log(columns);
+    try {
+      chrome.storage.sync.set({
+        "columns": columns,
+        "labels": labels,
+        "settings": settings,
+      }, function() {
+        if (chrome.runtime.error) {
+          console.log("Runtime error. Failed to save data");
+        }
+      });
+    } catch (error) {
+      console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
+    }
+  }, [columns, labels, settings])
+
+  useEffect(() => {
+    document.addEventListener("keydown", keyShortcutHandler);
+    return () => {
+      document.removeEventListener('keydown', keyShortcutHandler);
+    };
+  });
 
   const setEditing = (item) => {
     setEditingId(item.id);
@@ -90,60 +168,6 @@ function App() {
     setCurrLabels({});
     setStartedEditing(false);
   };
-
-  // Load data
-  useEffect(() => {
-    let getColumns;
-    let getLabels;
-    try {
-      chrome.storage.sync.get("columns", function(data) {
-        if (!chrome.runtime.error) {
-          getColumns = data.columns;
-        }
-  
-        if(getColumns && getColumns !== "undefined") {
-          setColumns(getColumns);
-        }
-      });
-      chrome.storage.sync.get("labels", function(data) {
-        if (!chrome.runtime.error) {
-          getLabels = data.labels;
-        }
-  
-        if(getLabels && getLabels !== "undefined") {
-          setLabels(getLabels);
-        }
-      });
-      setLoaded(true);
-    } catch (error) {
-      console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
-      setLoaded(true);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);  
-
-  useEffect(() => {
-    // console.log(columns);
-    try {
-      chrome.storage.sync.set({
-        "columns": columns,
-        "labels": labels
-      }, function() {
-        if (chrome.runtime.error) {
-          console.log("Runtime error. Failed to save data");
-        }
-      });
-    } catch (error) {
-      console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
-    }
-  }, [columns, labels])
-
-  useEffect(() => {
-    document.addEventListener("keydown", keyShortcutHandler);
-    return () => {
-      document.removeEventListener('keydown', keyShortcutHandler);
-    };
-  });
 
   const keyShortcutHandler = (e) => {
     if (e.code === "Space" && !labelsListExpanded && !inputExpanded && !isEditingId && !showSettings) {
@@ -190,7 +214,6 @@ function App() {
         sourceItems.splice(destination.index, 0, removed);
       }
     }
-
     setColumns(currColumns);
   };
 
@@ -341,11 +364,11 @@ function App() {
           </div>
         </div>
         <div className="close-button" onClick={() => setShowSettings(false)}>
-          <CloseIcon color={delCol} size={30}/>
+          <CloseIcon color={theme.delCol} size={30}/>
         </div>
         <span className="copyright-header">atude (Mozamel Anwary) © {currYear}</span>
         <div className="settings-shortcuts-container">
-          <p className="shortcuts-header">Shortcuts</p>
+          <p className="settings-subheader">Shortcuts</p>
           <div className="shortcut-item">
             <span><i>alt+k / opt+k</i></span>
             <span>Open Kanbie</span>
@@ -371,6 +394,56 @@ function App() {
             <span>Edit task or column header</span>
           </div>
         </div>
+        <div className="settings-themes-container">
+          <p className="settings-subheader">Themes</p>
+          <div className="settings-select-content">
+            {Object.keys(themes).map(themeName => (
+              <span 
+                className={themeName === settings.theme ? 
+                  "select-item select-item-selected" : 
+                  "select-item"
+                }
+                onClick={() => setSettings((currSettings) => ({
+                  ...currSettings,
+                  theme: themeName,
+                }))}
+              >
+                {themeName}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="settings-hidelogo-container">
+          <p className="settings-subheader">Hide Kanbie Text</p>
+          <div className="settings-select-content">
+            <span 
+              className={
+                settings.hideKanbieText ? 
+                  "select-item select-item-selected" : 
+                  "select-item"
+              }
+              onClick={() => setSettings((currSettings) => ({
+                ...currSettings,
+                hideKanbieText: true,
+              }))}
+            >
+              yes
+            </span>
+            <span 
+              className={
+                !settings.hideKanbieText ? 
+                  "select-item select-item-selected" : 
+                  "select-item"
+              }
+              onClick={() => setSettings((currSettings) => ({
+                ...currSettings,
+                hideKanbieText: false,
+              }))}
+            >
+              no
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -383,9 +456,9 @@ function App() {
   const shiftLabelColor = (labelId) => {
     const labelsCopy = [...labels];
     const labelIndex = labelsCopy.findIndex(label => label.id === labelId);
-    labelsCopy[labelIndex].color = colorPanelColors[
-      colorPanelColors.findIndex(panelColor => panelColor === labelsCopy[labelIndex].color)
-    + 1] || colorPanelColors[0];
+    labelsCopy[labelIndex].color = theme.panelColors[
+      theme.panelColors.findIndex(panelColor => panelColor === labelsCopy[labelIndex].color)
+    + 1] || theme.panelColors[0];
 
     setLabels(labelsCopy);
   };
@@ -422,7 +495,7 @@ function App() {
       labels.push({
         id: uuid(),
         display: labelText,
-        color: colorPanelColors[Math.floor(Math.random() * colorPanelColors.length)]
+        color: theme.panelColors[Math.floor(Math.random() * theme.panelColors.length)]
       });
 
       setLabelText("");
@@ -447,7 +520,7 @@ function App() {
               style={{backgroundColor: 
                 labels.find(label => 
                   label.id === filteredLabel.replace(labelRegex, "$2")
-                )?.color || "#000"
+                )?.color || theme.backgroundDark
               }}
             >
               {filteredLabel.replace(labelRegex, "$1")}
@@ -460,10 +533,17 @@ function App() {
   return (
     <div>
       <div className="header-container">
-        <img alt="logo" src={KanbieLogo} width={28} className="kanbie-logo"/>
-        <div className="header">
-          kanbie
-        </div>
+        <img 
+          alt="logo" 
+          src={KanbieLogo} 
+          width={28} 
+          className={settings?.hideKanbieText ? "header" : "kanbie-logo"}
+        />
+        {!settings?.hideKanbieText && (
+          <div className="header">
+            kanbie
+          </div>
+        )}
       </div>
       {!!loaded && 
       <div className="main-container">
@@ -505,9 +585,9 @@ function App() {
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     style={{
-                      borderColor: columnBorderColor,
+                      borderColor: theme.columnBorderColor,
                       borderWidth: snapshot.isDraggingOver ? "2px" : 0,
-                      backgroundColor: columnBgColor,
+                      backgroundColor: theme.columnBgColor,
                     }}
                     className="droppable-container column-container"
                   > 
@@ -519,7 +599,9 @@ function App() {
                           const itemLabelIds = itemLabelsRaw?.map(label => label.match(/\(.*\)/)[0].slice(1, -1))
                           if (itemLabelIds?.length) {
                             itemLabelIds.reverse().forEach((labelId) => {
-                              itemLabels[labelId] = labels.find((lbl) => lbl.id === labelId).display
+                              if (labels.find((lbl) => lbl.id === labelId)) {
+                                itemLabels[labelId] = labels.find((lbl) => lbl.id === labelId)?.display
+                              }
                             });
                           }
                           setCurrLabels(itemLabels ?? {});
@@ -575,7 +657,7 @@ function App() {
                                 ref={provided.innerRef}
                                 style={{
                                   userSelect: 'none',
-                                  backgroundColor: snapshot.isDragging ? cardBgActiveCol : cardBgCol,
+                                  backgroundColor: snapshot.isDragging ? theme.cardBgActiveCol : theme.cardBgCol,
                                   ...provided.draggableProps.style
                                 }}
                                 className="draggable-card"
@@ -601,12 +683,12 @@ function App() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 style={{
-                  background: snapshot.isDraggingOver ? delActiveCol : delCol,
+                  background: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
                   width: snapshot.isDraggingOver ? "200px" : "20px"
                 }}
                 className="droppable-container droppable-trash"
               > 
-                <DeleteForeverIcon color="#fff" className="delete-icon"/>
+                <DeleteForeverIcon color={theme.accent} className="delete-icon"/>
                 <span 
                   className={`delete-me-text ${snapshot.isDraggingOver ? "transitioner" : ""}`}
                 >
@@ -620,25 +702,25 @@ function App() {
           className="droppable-container droppable-clear-all button-icon"
           onClick={() => onDeleteAllDone()}
         > 
-          <NotificationClearAllIcon color="#fff" className="delete-all-icon"/>
+          <NotificationClearAllIcon color={theme.accent} className="delete-all-icon"/>
         </div>
         <div 
           className="add-button-container droppable-container"
           onClick={() => setInputExpanded(!inputExpanded)}
         >
-          <PlusIcon color="#fff" className="add-icon"/>
+          <PlusIcon color={theme.accent} className="add-icon"/>
         </div>
         <div 
           className="labels-button-container droppable-container"
           onClick={() => setLabelsListExpanded(!labelsListExpanded)}
         >
-          <LabelMultipleIcon color="#fff" className="add-icon"/>
+          <LabelMultipleIcon color={theme.accent} className="add-icon"/>
         </div>
         <div 
           className="settings-button-container droppable-container"
           onClick={() => setShowSettings(true)}
         >
-          <CogIcon color="#fff" className="add-icon"/>
+          <CogIcon color={theme.accent} className="add-icon"/>
         </div>
         {!!inputExpanded && renderInputBox()}
         {!!labelsListExpanded && renderLabelsList()}

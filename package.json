@@ -20,7 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "INLINE_RUNTIME_CHUNK=false react-scripts build",
-    "build-pack": "npm run build && npm run zip",
+    "build-pack": "yarn build && yarn zip",
     "zip": "bestzip bundle.zip build/*",
     "eject": "react-scripts eject"
   },

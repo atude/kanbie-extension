@@ -1,10 +1,3 @@
-export const delCol = "#802626";
-export const delActiveCol = "#9b2e2e";
-export const cardBgCol = "#3f4447";
-export const cardBgActiveCol = "#434b4f";
-export const columnBgColor = "#2f3437";
-export const columnBorderColor = "#9b2e85";
-
 export const colorPanelColors = [
   "#33333355",
   "#ff00e655",
@@ -16,3 +9,42 @@ export const colorPanelColors = [
   "#ff893655",
   "#ff303055",
 ];
+
+export const themes = {
+  dark: {
+    accent: "#fff",
+    background: "#25292b",
+    backgroundSecondary: "#1e2123",
+    backgroundGrey: "#333",
+    backgroundDark: "#000",
+    accentColored: "#80266e",
+    accentColoredBright: "#ed39c9",
+    accentColoredDark: "#9b2e85",
+    delCol: "#802626",
+    delActiveCol: "#9b2e2e",
+    cardBgCol: "#3f4447",
+    cardBgActiveCol: "#434b4f",
+    columnBgColor: "#2f3437",
+    columnBorderColor: "#9b2e85",
+    shadow: "rgba(0, 0, 0, 0.2)",
+    panelColors: colorPanelColors,
+  },
+  light: {
+    accent: "#333",
+    background: "#f5f5f5",
+    backgroundSecondary: "#ededed",
+    backgroundGrey: "#fff",
+    backgroundDark: "#fff",
+    accentColored: "#ecdaed",
+    accentColoredBright: "#ed39c9",
+    accentColoredDark: "#ed39c9",
+    delCol: "#ff8080",
+    delActiveCol: "#f54e4e",
+    cardBgCol: "#ededed",
+    cardBgActiveCol: "#bdbdbd",
+    columnBgColor: "#fff",
+    columnBorderColor: "#ed39c9",
+    shadow: "rgba(0, 0, 0, 0)",
+    panelColors: colorPanelColors,
+  }
+}

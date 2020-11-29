@@ -1,19 +1,30 @@
-/*Custom scrollbar*/
+:root {
+  --bg1: #25292b;
+  --bg2: #1e2123;
+  --bg3: #333;
+  --accent: #fff;
+  --accentColored: #80266e;
+  --accentColoredBright: #ed39c9;
+  --accentColoredDark: #9b2e85;
+  --accentDelete: #9b2e2e;
+  --shadow: rgba(0, 0, 0, 0.3);
+}
+
 ::-webkit-scrollbar {
   position: absolute;
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #25292b;
+  background: var(--bg1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e2123; 
+  background: var(--bg2); 
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #680b54; 
+  background: var(--accentColored); 
 }
 
 body {
@@ -21,7 +32,7 @@ body {
   width: 700px;
   height: 520px;
   font-family: 'Roboto', sans-serif;
-  background-color: #25292b;
+  background-color: var(--bg1);
   font-size: medium;
 }
 
@@ -39,7 +50,7 @@ body {
   text-align: center;
   font-size: 20px;
   padding: 20px;
-  color: #ed39c9;
+  color: var(--accentColoredBright);
   font-weight: 200;
 }
 
@@ -57,7 +68,7 @@ body {
 }
 
 .column-heading {
-  color: #fff;
+  color: var(--accent);
   margin: 4px;
   padding-left: 4px;
   padding-top: 2px;
@@ -68,12 +79,12 @@ body {
 }
 
 .column-heading-editing {
-  color: #fff;
+  color: var(--accent);
   padding-left: 4px;
   margin-bottom: 10px;
-  border: 2px solid #9b2e85;
-  box-shadow: 1px 1px 4px #25292b;
-  background-color: #25292b;
+  border: 2px solid var(--accentColoredDark);
+  box-shadow: 1px 1px 4px var(--shadow);
+  background-color: var(--bg1);
   border-radius: 4px;
   outline: none;
 }
@@ -84,7 +95,7 @@ body {
   padding: 10px;
   margin-left: 4px;
   margin-right: 4px;
-  box-shadow: 1px 1px 4px #1e2123;
+  box-shadow: 1px 1px 4px var(--shadow);
   margin-bottom: 20px;
   transition: all 0.2s;
 }
@@ -103,11 +114,11 @@ body {
   top: 0;
   right: 0;
   margin: 12px;
-  background-color: #1e2123;
+  background-color: var(--bg2);
 }
 
 .droppable-clear-all:hover {
-  background-color: #9b2e2e;
+  background-color: var(--accentDelete);
   cursor: pointer;
 }
 
@@ -115,7 +126,7 @@ body {
   height: 0;
   width: 0;
   opacity: 0;
-  color: #fff;
+  color: var(--accent);
   position: absolute;
   margin-top: -20px;
   margin-left: 120px;
@@ -141,8 +152,8 @@ body {
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 8px;
-  box-shadow: 1px 1px 4px #25292b;
-  color: white;
+  box-shadow: 1px 1px 4px var(--shadow);
+  color: var(--accent);
   font-size: smaller;
   word-break: break-word;
 }
@@ -185,12 +196,12 @@ body {
 }
 
 .add-button-container:not(:hover) {
-  background-color: #80266e;
+  background-color: var(--accentColored);
   transition: all 0.1s;
 }
 
 .add-button-container:hover {
-  background-color: #9b2e85;
+  background-color: var(--accentColoredDark);
   transition: all 0.1s;
   cursor: pointer;
 }
@@ -210,12 +221,12 @@ body {
 }
 
 .labels-button-container:not(:hover) {
-  background-color: #80266e;
+  background-color: var(--accentColored);
   transition: all 0.1s;
 }
 
 .labels-button-container:hover {
-  background-color: #9b2e85;
+  background-color: var(--accentColoredDark);
   transition: all 0.1s;
   cursor: pointer;
 }
@@ -235,12 +246,12 @@ body {
 }
 
 .settings-button-container:not(:hover) {
-  background-color: #80266e;
+  background-color: var(--accentColored);
   transition: all 0.1s;
 }
 
 .settings-button-container:hover {
-  background-color: #9b2e85;
+  background-color: var(--accentColoredDark);
   transition: all 0.1s;
   cursor: pointer;
 }
@@ -252,29 +263,29 @@ body {
   left: 0;
   margin-left: 10px;
   margin-top: 60px;
-  border: 2px solid #9b2e85;
-  box-shadow: 1px 1px 4px #25292b;
-  background-color: #25292b;
+  border: 2px solid var(--accentColoredDark);
+  box-shadow: 1px 1px 4px var(--shadow);
+  background-color: var(--bg1);
   border-radius: 10px;
 }
 
 .input-container-inplace {
   margin-bottom: 8px;
-  border: 2px solid #9b2e85;
-  box-shadow: 1px 1px 4px #25292b;
-  background-color: #25292b;
+  border: 2px solid var(--accentColoredDark);
+  box-shadow: 1px 1px 4px var(--shadow);
+  background-color: var(--bg1);
   border-radius: 10px;
 }
 
 .input-add {
-  background-color: #25292b;
+  background-color: var(--bg1);
   min-height: 100px;
   border-radius: 10px;
   width: 220px;
 }
 
 .input-add-inplace {
-  background-color: #25292b;
+  background-color: var(--bg1);
   border-radius: 10px;
   width: 100%;
 }
@@ -283,13 +294,13 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #25292b;
+  background-color: var(--bg1);
   padding: 2px;
-  border: 2px solid #9b2e85;
+  border: 2px solid var(--accentColoredDark);
   margin-top: 60px;
   margin-left: 60px;
   padding: 8px;
-  color: #fff;
+  color: var(--accent);
   width: max-content;
   border-radius: 10px;
   transform: none;
@@ -320,10 +331,10 @@ body {
 }
 
 .curr-labels-container {
-  border-top: 1px solid #2f3437;
+  border-top: 1px solid var(--bg3);
   padding: 8px 4px;
   margin-top: 2px;
-  color: #fff;
+  color: var(--accent);
   font-size: small;
   display: flex;
   flex-direction: row;
@@ -353,7 +364,7 @@ body {
 }
 
 .label-input {
-  border: 1px solid #333;
+  border: 1px solid var(--bg3);
 }
 
  /* --> Styles required from react-mentions */
@@ -375,17 +386,17 @@ body {
   outline: none;
   padding: 8px;
   outline: none;
-  color: #fff;
+  color: var(--accent);
 }
 .mentions__suggestions__list {
-  background-color: #25292b;
-  box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.4);
+  background-color: var(--bg1);
+  box-shadow: 2px 2px 8px 0px var(--shadow);
 }
 .mentions__suggestions__item {
   padding: 5px 10px;
-  color: #fff;
+  color: var(--accent);
   font-size: smaller;
 }
 .mentions__suggestions__item--focused {
-  background-color: #333;
+  background-color: var(--bg3);
 }
