@@ -16,7 +16,7 @@
 
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import "./App.css";
 import "./Settings.css";
 
@@ -41,22 +41,24 @@ import FormatColorFillIcon from "mdi-react/FormatColorFillIcon";
 import NotificationClearAllIcon from "mdi-react/NotificationClearAllIcon";
 import CogIcon from "mdi-react/CogIcon";
 import { filterString } from "./utils";
+import { Settings } from "./api";
 
 const currYear = new Date().getFullYear();
 const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
 
 function App() {
+	const [boardState, dispatch] = useReducer(boardReducer, initialBoardState);
 	const [columns, setColumns] = useState(initColumns);
 	const [labels, setLabels] = useState([]);
-	const [settings, setSettings] = useState(initSettings);
+	const [settings, setSettings] = useState<Settings>();
 	const [currLabels, setCurrLabels] = useState({});
 	const [inputExpanded, setInputExpanded] = useState(false);
 	const [inputText, setInputText] = useState("");
 	const [labelsListExpanded, setLabelsListExpanded] = useState(false);
 	const [labelText, setLabelText] = useState("");
 	const [loaded, setLoaded] = useState(false);
-	const [isEditingId, setEditingId] = useState();
+	const [isEditingId, setEditingId] = useState<string | undefined>();
 	const [startedEditing, setStartedEditing] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
 
@@ -89,7 +91,7 @@ function App() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);  
 
-	const theme = settings?.theme ? themes[settings?.theme] : themes.dark;
+	const theme = settings?.theme ? (themes[settings?.theme] ?? themes.dark) : themes.dark;
 	const columnIconProps = {
 		size: 24,
 		color: theme.accent,
@@ -142,7 +144,7 @@ function App() {
 
 	const saveAndResetEditing = () => {
 		onEditTask();
-		setEditingId();
+		setEditingId(undefined);
 		setInputText("");
 		setCurrLabels({});
 		setStartedEditing(false);
@@ -150,13 +152,13 @@ function App() {
 
 	const saveAndResetEditingHeader = () => {
 		onEditHeader();
-		setEditingId();
+		setEditingId(undefined);
 		setInputText("");
 		setCurrLabels({});
 		setStartedEditing(false);
 	};
 
-	const keyShortcutHandler = (e) => {
+	const keyShortcutHandler = (e: KeyboardEvent) => {
 		if (e.code === "Space" && !labelsListExpanded && !inputExpanded && !isEditingId && !showSettings) {
 			setInputExpanded(!inputExpanded);
 			setTimeout(() => setInputText(""), 0);
@@ -478,7 +480,7 @@ function App() {
 	};
 
 	const onAddLabel = (e) => {
-		if(e.key === "Enter" && labelText !== "") {
+		if (e.key === "Enter" && labelText !== "") {
 			labels.push({
 				id: uuid(),
 				display: labelText,

@@ -1,10 +1,25 @@
-type TaskColumns @model {
+type Board @model {
+	id: ID!
+	columns: [TaskColumn!]
+}
+
+type TaskColumn @model {
   id: ID!
   name: String!
-  tasks: [Task]
+  tasks: [Task!]
 }
 
 type Task @model {
 	id: ID!
 	content: String!
+}
+
+type Settings @model {
+	theme: Theme!
+  hideKanbieText: Boolean!
+}
+
+enum Theme {
+	dark
+	light
 }

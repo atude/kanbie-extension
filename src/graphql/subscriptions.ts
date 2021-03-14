@@ -2,9 +2,72 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateTaskColumns = /* GraphQL */ `
-  subscription OnCreateTaskColumns {
-    onCreateTaskColumns {
+export const onCreateBoard = /* GraphQL */ `
+  subscription OnCreateBoard {
+    onCreateBoard {
+      id
+      columns {
+        id
+        name
+        tasks {
+          id
+          content
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateBoard = /* GraphQL */ `
+  subscription OnUpdateBoard {
+    onUpdateBoard {
+      id
+      columns {
+        id
+        name
+        tasks {
+          id
+          content
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteBoard = /* GraphQL */ `
+  subscription OnDeleteBoard {
+    onDeleteBoard {
+      id
+      columns {
+        id
+        name
+        tasks {
+          id
+          content
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateTaskColumn = /* GraphQL */ `
+  subscription OnCreateTaskColumn {
+    onCreateTaskColumn {
       id
       name
       tasks {
@@ -18,9 +81,9 @@ export const onCreateTaskColumns = /* GraphQL */ `
     }
   }
 `;
-export const onUpdateTaskColumns = /* GraphQL */ `
-  subscription OnUpdateTaskColumns {
-    onUpdateTaskColumns {
+export const onUpdateTaskColumn = /* GraphQL */ `
+  subscription OnUpdateTaskColumn {
+    onUpdateTaskColumn {
       id
       name
       tasks {
@@ -34,9 +97,9 @@ export const onUpdateTaskColumns = /* GraphQL */ `
     }
   }
 `;
-export const onDeleteTaskColumns = /* GraphQL */ `
-  subscription OnDeleteTaskColumns {
-    onDeleteTaskColumns {
+export const onDeleteTaskColumn = /* GraphQL */ `
+  subscription OnDeleteTaskColumn {
+    onDeleteTaskColumn {
       id
       name
       tasks {
@@ -75,6 +138,39 @@ export const onDeleteTask = /* GraphQL */ `
     onDeleteTask {
       id
       content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateSettings = /* GraphQL */ `
+  subscription OnCreateSettings {
+    onCreateSettings {
+      id
+      theme
+      hideKanbieText
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateSettings = /* GraphQL */ `
+  subscription OnUpdateSettings {
+    onUpdateSettings {
+      id
+      theme
+      hideKanbieText
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteSettings = /* GraphQL */ `
+  subscription OnDeleteSettings {
+    onDeleteSettings {
+      id
+      theme
+      hideKanbieText
       createdAt
       updatedAt
     }
