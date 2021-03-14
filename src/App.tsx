@@ -63,25 +63,25 @@ function App() {
 	// Load data
 	useEffect(() => {
 		try {
-			chrome.storage.sync.get("columns", (data) => {
-				const getColumns = !chrome.runtime.error ? data.columns : undefined;
-				if (getColumns && getColumns !== "undefined") {
-					setColumns(getColumns);
-				}
-			});
-			chrome.storage.sync.get("labels", (data) => {
-				const getLabels = !chrome.runtime.error ? data.labels : undefined;
-				if (getLabels && getLabels !== "undefined") {
-					setLabels(getLabels);
-				}
-			});
-			chrome.storage.sync.get("settings", (data) => {
-				const getSettings = !chrome.runtime.error ? data.settings : undefined;
-				if (getSettings && getSettings !== "undefined") {
-					setSettings(getSettings);
-				}
-			});
-			setLoaded(true);
+			// chrome.storage.sync.get("columns", (data) => {
+			// 	const getColumns = !chrome.runtime.error ? data.columns : undefined;
+			// 	if (getColumns && getColumns !== "undefined") {
+			// 		setColumns(getColumns);
+			// 	}
+			// });
+			// chrome.storage.sync.get("labels", (data) => {
+			// 	const getLabels = !chrome.runtime.error ? data.labels : undefined;
+			// 	if (getLabels && getLabels !== "undefined") {
+			// 		setLabels(getLabels);
+			// 	}
+			// });
+			// chrome.storage.sync.get("settings", (data) => {
+			// 	const getSettings = !chrome.runtime.error ? data.settings : undefined;
+			// 	if (getSettings && getSettings !== "undefined") {
+			// 		setSettings(getSettings);
+			// 	}
+			// });
+			// setLoaded(true);
 		} catch (error) {
 			console.warn("Error syncing with chrome API. Are you using this as a webapp?");
 			setLoaded(true);
@@ -114,15 +114,15 @@ function App() {
 	useEffect(() => {
 		// console.log(columns);
 		try {
-			chrome.storage.sync.set({
-				"columns": columns,
-				"labels": labels,
-				"settings": settings,
-			}, function() {
-				if (chrome.runtime.error) {
-					console.log("Runtime error. Failed to save data");
-				}
-			});
+			// chrome.storage.sync.set({
+			// 	"columns": columns,
+			// 	"labels": labels,
+			// 	"settings": settings,
+			// }, function() {
+			// 	if (chrome.runtime.error) {
+			// 		console.log("Runtime error. Failed to save data");
+			// 	}
+			// });
 		} catch (error) {
 			console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
 		}
@@ -250,11 +250,11 @@ function App() {
 		setColumns(currColumns);
 	};
 
-	const addCurrLabel = (id, display) => {
+	const addCurrLabel = (id: string, display: string) => {
 		setCurrLabels({...currLabels, [id]: display});
 	};
 
-	const renderInputBox = () => (
+	const renderInputBox = (): JSX.Element => (
 		<OutsideClickHandler 
 			onOutsideClick={() => {
 				setInputExpanded(false);
@@ -286,7 +286,7 @@ function App() {
           	{Object.keys(currLabels).map((keyLabel) => (
           		<span 
           			className="curr-label-item"
-          			style={{backgroundColor: labels.find(label => label.id === keyLabel).color}}
+          			style={{ backgroundColor: labels.find((label) => label.id === keyLabel)?.color || "inherit"}}
           			key={keyLabel}
           		>
           			{currLabels[keyLabel]}

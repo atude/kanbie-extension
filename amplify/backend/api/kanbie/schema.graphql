@@ -1,0 +1,10 @@
+type TaskColumns @model {
+  id: ID!
+  name: String!
+  tasks: [Task]
+}
+
+type Task @model {
+	id: ID!
+	content: String!
+}

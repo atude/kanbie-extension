@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-kanbie-dev-194038-authRole",
+      "UnauthRoleArn": "arn:aws:iam::718480689394:role/amplify-kanbie-dev-194038-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::718480689394:role/amplify-kanbie-dev-194038-authRole",
+      "Region": "ap-southeast-2",
+      "DeploymentBucketName": "amplify-kanbie-dev-194038-deployment",
+      "UnauthRoleName": "amplify-kanbie-dev-194038-unauthRole",
+      "StackName": "amplify-kanbie-dev-194038",
+      "StackId": "arn:aws:cloudformation:ap-southeast-2:718480689394:stack/amplify-kanbie-dev-194038/f48da750-84a0-11eb-996f-06e023663710",
+      "AmplifyAppId": "d3l7v7htlm0b3u"
+    }
+  }
+}
