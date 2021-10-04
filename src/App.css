@@ -40,6 +40,9 @@ body {
 .kanbie-logo {
   margin: -10px;
   padding-top: 3px;
+}
+
+.kanbie-logo-color {
 	filter: hue-rotate(var(--kanbie-logo-hue-rotate));
 }
 

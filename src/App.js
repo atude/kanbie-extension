@@ -4,7 +4,8 @@
 
   TODO
 
-  - Add themes
+	- Alarm functionality - schedule due dates for tasks
+  - More themes
  
   MAINTENANCE
 
@@ -539,7 +540,9 @@ function App() {
           alt="logo" 
           src={KanbieLogo} 
           width={28} 
-          className={settings?.hideKanbieText ? "header" : "kanbie-logo"}
+          className={
+						settings?.hideKanbieText ? "header kanbie-logo-color" : "kanbie-logo kanbie-logo-color"
+					}
         />
         {!settings?.hideKanbieText && (
           <div className="header">

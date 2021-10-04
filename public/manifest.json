@@ -12,7 +12,8 @@
     "128": "logo-small.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+		"alarms"
   ],
   "commands": {
     "_execute_browser_action": {
