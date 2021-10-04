@@ -47,6 +47,7 @@ const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
 
 function App() {
+	// const [connectionStatus, setConnectionStatus] = useState(false);
   const [columns, setColumns] = useState(initColumns);
   const [labels, setLabels] = useState([]);
   const [settings, setSettings] = useState(initSettings);
@@ -120,6 +121,8 @@ function App() {
     root.style.setProperty('--accentColoredDark', theme.accentColoredDark);
     root.style.setProperty('--accentDelete', theme.delCol);
     root.style.setProperty('--shadow', theme.shadow);
+		root.style.setProperty('--kanbie-logo-hue-rotate', theme.kanbieLogoHueRotate);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
 
@@ -691,7 +694,7 @@ function App() {
                 <span 
                   className={`delete-me-text ${snapshot.isDraggingOver ? "transitioner" : ""}`}
                 >
-                  Delete me!
+                  Delete forever
                 </span>
               </div>
             )}  

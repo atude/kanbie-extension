@@ -28,6 +28,7 @@ export const themes = {
     columnBorderColor: "#9b2e85",
     shadow: "rgba(0, 0, 0, 0.2)",
     panelColors: colorPanelColors,
+		kanbieLogoHueRotate: 0,
   },
   light: {
     accent: "#333",
@@ -46,5 +47,25 @@ export const themes = {
     columnBorderColor: "#ed39c9",
     shadow: "rgba(0, 0, 0, 0)",
     panelColors: colorPanelColors,
+		kanbieLogoHueRotate: "0deg",
+  },
+	blue: {
+    accent: "#333",
+    background: "#f5f5f5",
+    backgroundSecondary: "#ededed",
+    backgroundGrey: "#fefefe",
+    backgroundDark: "#fff",
+    accentColored: "#E3F2FD",
+    accentColoredBright: "#4285f4",
+    accentColoredDark: "#4285f4",
+    delCol: "#ff8080",
+    delActiveCol: "#f54e4e",
+    cardBgCol: "#ededed",
+    cardBgActiveCol: "#bdbdbd",
+    columnBgColor: "#fff",
+    columnBorderColor: "#4285f4",
+    shadow: "rgba(0, 0, 0, 0)",
+    panelColors: colorPanelColors,
+		kanbieLogoHueRotate: "270deg",
   }
 }

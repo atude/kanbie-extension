@@ -8,6 +8,7 @@
   --accentColoredDark: #9b2e85;
   --accentDelete: #9b2e2e;
   --shadow: rgba(0, 0, 0, 0.3);
+	--kanbie-logo-hue-rotate: 180deg;
 }
 
 ::-webkit-scrollbar {
@@ -39,6 +40,7 @@ body {
 .kanbie-logo {
   margin: -10px;
   padding-top: 3px;
+	filter: hue-rotate(var(--kanbie-logo-hue-rotate));
 }
 
 .header-container {
@@ -129,7 +131,7 @@ body {
   color: var(--accent);
   position: absolute;
   margin-top: -20px;
-  margin-left: 120px;
+  margin-left: 100px;
   overflow: hidden;
 }
 
