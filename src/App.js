@@ -35,6 +35,7 @@ import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutli
 import CheckboxMarkedCircleIcon from 'mdi-react/CheckboxMarkedCircleIcon';
 import ProgressCheckIcon from 'mdi-react/ProgressCheckIcon';
 import DeleteForeverIcon from 'mdi-react/DeleteForeverIcon';
+import CloseCirleIcon from 'mdi-react/CloseCircleIcon';
 import PlusIcon from 'mdi-react/PlusIcon';
 import LabelMultipleIcon from 'mdi-react/LabelMultipleIcon';
 import CloseIcon from 'mdi-react/CloseIcon';
@@ -48,7 +49,6 @@ const maxItems = 10;
 const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
 
 function App() {
-	// const [connectionStatus, setConnectionStatus] = useState(false);
   const [columns, setColumns] = useState(initColumns);
   const [labels, setLabels] = useState([]);
   const [settings, setSettings] = useState(initSettings);
@@ -68,7 +68,7 @@ function App() {
     let getLabels;
     let getSettings;
     try {
-      chrome.storage.sync.get("columns", function(data) {
+      chrome.storage.sync.get("columns", (data) => {
         if (!chrome.runtime.error) {
           getColumns = data.columns;
         }
@@ -77,7 +77,7 @@ function App() {
           setColumns(getColumns);
         }
       });
-      chrome.storage.sync.get("labels", function(data) {
+      chrome.storage.sync.get("labels", (data) => {
         if (!chrome.runtime.error) {
           getLabels = data.labels;
         }
@@ -86,7 +86,7 @@ function App() {
           setLabels(getLabels);
         }
       });
-      chrome.storage.sync.get("settings", function(data) {
+      chrome.storage.sync.get("settings", (data) => {
         if (!chrome.runtime.error) {
           getSettings = data.settings;
         }
@@ -123,7 +123,7 @@ function App() {
     root.style.setProperty('--accentDelete', theme.delCol);
     root.style.setProperty('--shadow', theme.shadow);
 		root.style.setProperty('--kanbie-logo-hue-rotate', theme.kanbieLogoHueRotate);
-
+		root.style.setProperty('--kanbie-logo-grayscale', theme.kanbieLogoGrayscale);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
 
@@ -142,6 +142,7 @@ function App() {
     } catch (error) {
       console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
     }
+		console.log(labels);
   }, [columns, labels, settings])
 
   useEffect(() => {
@@ -235,6 +236,7 @@ function App() {
         return {
           ...column,
           items: column.items.map(task => {
+						console.log(task);
             if (task.id === isEditingId) {
               if (inputText) {
                 return {
@@ -267,7 +269,16 @@ function App() {
   };
 
   const addCurrLabel = (id, display) => {
-    setCurrLabels({...currLabels, [id]: display});
+    setCurrLabels({ ...currLabels, [id]: display });
+		console.log(currLabels);
+  };
+
+	const removeCurrLabel = (id) => {
+		const { [id]: existingLabel, ...currLabelsEdited } = currLabels;
+    setCurrLabels(currLabelsEdited);
+		// Remove label from text content too
+		console.log(inputText.replace(`@[${existingLabel}](${id})`, ""));
+		setInputText(inputText.replace(`@[${existingLabel}](${id})`, ""));
   };
 
   const renderInputBox = () => (
@@ -638,13 +649,17 @@ function App() {
                               </MentionsInput>
                               {!!Object.values(currLabels).length && 
                                 <div className="curr-labels-container">
-                                  {Object.keys(currLabels).map((keyLabel, i) => (
+                                  {Object.keys(currLabels).map((keyLabel) => (
                                     <span 
                                       className="curr-label-item"
                                       style={{backgroundColor: labels.find(label => label.id === keyLabel).color}}
                                       key={keyLabel}
                                     >
                                       {currLabels[keyLabel]}
+																			<CloseCirleIcon 
+																				onClick={() => removeCurrLabel(keyLabel)} 
+																				className="remove-label-icon"
+																			/>
                                     </span>
                                   ))}
                                 </div>
