@@ -43,6 +43,7 @@ import FormatColorFillIcon from 'mdi-react/FormatColorFillIcon';
 import NotificationClearAllIcon from 'mdi-react/NotificationClearAllIcon';
 import CogIcon from 'mdi-react/CogIcon';
 import { filterString } from './utils';
+import { allTimes } from './constants/generic';
 
 const currYear = new Date().getFullYear();
 const maxItems = 10;
@@ -53,6 +54,7 @@ function App() {
   const [labels, setLabels] = useState([]);
   const [settings, setSettings] = useState(initSettings);
   const [currLabels, setCurrLabels] = useState({});
+	const [currAlarm, setCurrAlarm] = useState();
   const [inputExpanded, setInputExpanded] = useState(false);
   const [inputText, setInputText] = useState("");
   const [labelsListExpanded, setLabelsListExpanded] = useState(false);
@@ -72,29 +74,29 @@ function App() {
         if (!chrome.runtime.error) {
           getColumns = data.columns;
         }
-  
         if (getColumns && getColumns !== "undefined") {
           setColumns(getColumns);
         }
       });
+
       chrome.storage.sync.get("labels", (data) => {
         if (!chrome.runtime.error) {
           getLabels = data.labels;
         }
-  
         if (getLabels && getLabels !== "undefined") {
           setLabels(getLabels);
         }
       });
+
       chrome.storage.sync.get("settings", (data) => {
         if (!chrome.runtime.error) {
           getSettings = data.settings;
         }
-  
         if (getSettings && getSettings !== "undefined") {
           setSettings(getSettings);
         }
       });
+
       setLoaded(true);
     } catch (error) {
       console.warn("Error syncing with chrome API. Are you using this as a webapp?");
@@ -136,13 +138,12 @@ function App() {
         "settings": settings,
       }, function() {
         if (chrome.runtime.error) {
-          console.log("Runtime error. Failed to save data");
+          console.warn("Runtime error. Failed to save data");
         }
       });
     } catch (error) {
       console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
     }
-		console.log(labels);
   }, [columns, labels, settings])
 
   useEffect(() => {
@@ -236,7 +237,6 @@ function App() {
         return {
           ...column,
           items: column.items.map(task => {
-						console.log(task);
             if (task.id === isEditingId) {
               if (inputText) {
                 return {
@@ -270,14 +270,12 @@ function App() {
 
   const addCurrLabel = (id, display) => {
     setCurrLabels({ ...currLabels, [id]: display });
-		console.log(currLabels);
   };
 
 	const removeCurrLabel = (id) => {
 		const { [id]: existingLabel, ...currLabelsEdited } = currLabels;
     setCurrLabels(currLabelsEdited);
 		// Remove label from text content too
-		console.log(inputText.replace(`@[${existingLabel}](${id})`, ""));
 		setInputText(inputText.replace(`@[${existingLabel}](${id})`, ""));
   };
 
@@ -297,7 +295,6 @@ function App() {
           className="mentions input-add"
           onKeyDown={e => onAddCard(e)}
           autoFocus
-          maxLength={100}
           allowSpaceInQuery
         >
           <Mention
@@ -307,6 +304,17 @@ function App() {
             displayTransform={() => ""}
             onAdd={(id, display) => addCurrLabel(id, display)}
           />
+					<Mention 
+						className="mentions__mention"
+						trigger="@"
+						data={allTimes}
+						onAdd={(id, display) => console.log(inputText)}
+					/>
+					{/* <Mention 
+						className="mentions__mention"
+						trigger={}
+						data={allTimes}
+					/> */}
         </MentionsInput>
         {!!Object.values(currLabels).length && 
           <div className="curr-labels-container">
