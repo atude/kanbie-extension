@@ -369,6 +369,12 @@ body {
 	align-items: center;
 }
 
+.curr-time-container {
+	background-color: var(--accentColored);
+	border-radius: 8px;
+	padding: 2px;
+}
+
 .card-label-container {
   padding-top: 10px;
   display: flex;

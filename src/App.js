@@ -42,8 +42,10 @@ import CloseIcon from 'mdi-react/CloseIcon';
 import FormatColorFillIcon from 'mdi-react/FormatColorFillIcon';
 import NotificationClearAllIcon from 'mdi-react/NotificationClearAllIcon';
 import CogIcon from 'mdi-react/CogIcon';
+import BellRingIcon from 'mdi-react/BellRingIcon';
 import { filterString } from './utils';
-import { allTimes } from './constants/generic';
+import { allDays, allTimes } from './constants/generic';
+import moment from 'moment';
 
 const currYear = new Date().getFullYear();
 const maxItems = 10;
@@ -54,7 +56,8 @@ function App() {
   const [labels, setLabels] = useState([]);
   const [settings, setSettings] = useState(initSettings);
   const [currLabels, setCurrLabels] = useState({});
-	const [currAlarm, setCurrAlarm] = useState();
+	const [currDateAlarm, setCurrDateAlarm] = useState();
+	const [currTimeAlarm, setCurrTimeAlarm] = useState();
   const [inputExpanded, setInputExpanded] = useState(false);
   const [inputText, setInputText] = useState("");
   const [labelsListExpanded, setLabelsListExpanded] = useState(false);
@@ -163,6 +166,7 @@ function App() {
     setEditingId();
     setInputText("");
     setCurrLabels({});
+		clearCurrAlarm();
     setStartedEditing(false);
   };
 
@@ -171,6 +175,7 @@ function App() {
     setEditingId();
     setInputText("");
     setCurrLabels({});
+		clearCurrAlarm();
     setStartedEditing(false);
   };
 
@@ -279,12 +284,35 @@ function App() {
 		setInputText(inputText.replace(`@[${existingLabel}](${id})`, ""));
   };
 
+	const addDateToCurrAlarm = (id, display) => {
+		const dateRaw = id.replace("__DATE: ", "");
+		setCurrDateAlarm(dateRaw);
+		if (!currTimeAlarm) {
+			setCurrTimeAlarm("00:00");
+		}
+	}
+
+	const addTimeToCurrAlarm = (id, display) => {
+		// setInputText(inputText.replace(`@[${display}](${id})`, ""));
+		const timeRaw = id.replace("__TIME: ", "");
+		setCurrTimeAlarm(timeRaw);
+		if (!currDateAlarm) {
+			setCurrDateAlarm(moment().format("DD/MM/YYYY"))
+		}
+	}
+
+	const clearCurrAlarm = () => {
+		setCurrDateAlarm();
+		setCurrTimeAlarm();
+	}
+
   const renderInputBox = () => (
     <OutsideClickHandler 
       onOutsideClick={() => {
         setInputExpanded(false);
         setInputText("");
         setCurrLabels({});
+				clearCurrAlarm();
       }}
     >
       <div className="input-container">
@@ -306,15 +334,16 @@ function App() {
           />
 					<Mention 
 						className="mentions__mention"
-						trigger="@"
+						trigger="t:"
 						data={allTimes}
-						onAdd={(id, display) => console.log(inputText)}
+						onAdd={(id, display) => addTimeToCurrAlarm(id, display)}
 					/>
-					{/* <Mention 
+					<Mention 
 						className="mentions__mention"
-						trigger={}
-						data={allTimes}
-					/> */}
+						trigger="d:"
+						data={allDays}
+						onAdd={(id, display) => addDateToCurrAlarm(id, display)}
+					/>
         </MentionsInput>
         {!!Object.values(currLabels).length && 
           <div className="curr-labels-container">
@@ -497,6 +526,7 @@ function App() {
       setInputExpanded(false);
       setInputText("");
       setCurrLabels({});
+			clearCurrAlarm();
     }
   };
 
@@ -654,6 +684,18 @@ function App() {
                                   displayTransform={() => ""}
                                   onAdd={(id, display) => addCurrLabel(id, display)}
                                 />
+																<Mention 
+																	className="mentions__mention"
+																	trigger="t:"
+																	data={allTimes}
+																	onAdd={(id, display) => addTimeToCurrAlarm(id, display)}
+																/>
+																<Mention 
+																	className="mentions__mention"
+																	trigger="d:"
+																	data={allDays}
+																	onAdd={(id, display) => addDateToCurrAlarm(id, display)}
+																/>
                               </MentionsInput>
                               {!!Object.values(currLabels).length && 
                                 <div className="curr-labels-container">
@@ -670,6 +712,19 @@ function App() {
 																			/>
                                     </span>
                                   ))}
+                                </div>
+                              }
+															{(currDateAlarm && currTimeAlarm) && 
+                                <div className="curr-labels-container curr-time-container">
+																	<span className="curr-label-item">
+																		<BellRingIcon size={16} style={{ marginRight: "6px" }} />
+																		{moment(`${currDateAlarm} ${currTimeAlarm}`, "DD/MM/YYYY HH:mm").format("dddd DD/MM, h:mmA")}
+																		<CloseCirleIcon 
+																			// TODO:
+																			// onClick={() => removeCurrLabel(keyLabel)} 
+																			className="remove-label-icon"
+																		/>
+																	</span>
                                 </div>
                               }
                             </div>
