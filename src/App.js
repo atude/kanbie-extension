@@ -358,6 +358,14 @@ function App() {
             ))}
           </div>
         }
+				{(currDateAlarm && currTimeAlarm) && 
+					<div className="curr-labels-container curr-time-container">
+						<span className="curr-label-item">
+							<BellRingIcon size={16} style={{ marginRight: "6px" }} />
+							{moment(`${currDateAlarm} ${currTimeAlarm}`, "DD/MM/YYYY HH:mm").format("dddd DD/MM, h:mmA")}
+						</span>
+					</div>
+				}
       </div>
     </OutsideClickHandler>
   );
