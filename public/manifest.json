@@ -13,7 +13,8 @@
   },
   "permissions": [
     "storage",
-		"alarms"
+		"alarms",
+		"notifications"
   ],
   "commands": {
     "_execute_browser_action": {

@@ -42,17 +42,75 @@ import CloseIcon from 'mdi-react/CloseIcon';
 import FormatColorFillIcon from 'mdi-react/FormatColorFillIcon';
 import NotificationClearAllIcon from 'mdi-react/NotificationClearAllIcon';
 import CogIcon from 'mdi-react/CogIcon';
-import { filterString } from './utils';
+import BellRingIcon from 'mdi-react/BellRingIcon';
+import { filterString, labelRegex, maxItems } from './utils/generic';
+import { allDays, allTimes } from './utils/time';
+import moment from 'moment';
 
 const currYear = new Date().getFullYear();
-const maxItems = 10;
-const labelRegex = /@\[([^\]]*)\]\(([^)]*)\)/g;
+
+// Alarm listener
+chrome.alarms.onAlarm.addListener((alarm) => {
+	try {
+		chrome.storage.sync.get("columns", (data) => {
+			if (!chrome.runtime.error) {
+				const columns = data.columns;
+				columns.forEach((column) => {
+					column.items.forEach((card) => {
+						if (card.id === alarm.name) {
+							// Create notif
+							const timeFrom = moment(new Date(alarm.scheduledTime)).fromNow();
+							chrome.notifications.create(
+								card.id, 
+								{ 
+									title: "Task is due", 
+									message: `${filterString(card.content)} was due ${timeFrom}.`, 
+									type: "basic", 
+									iconUrl: "./logo-small.png" 
+								},
+								() => {}
+							);
+							try {
+								chrome.storage.sync.get("alarms", (data) => {
+									if (!chrome.runtime.error) {
+										const alarms = {
+											...data.alarms,
+											[alarm.name]: {
+												...data.alarms[alarm.name],
+												notified: true,
+											},
+										};
+										chrome.storage.sync.set({
+											"alarms": alarms,
+										}, () => {
+											if (chrome.runtime.error) {
+												console.warn("Runtime error. Failed to save edited alarms.");
+											}
+										});
+									}
+								})
+							} catch (error) {
+								console.warn("Error syncing storage with chrome extensions.");
+							}
+						}
+					});
+					return;
+				});
+			}
+		});
+	} catch (error) {
+		console.warn("Could not trigger alarm.");
+	}
+});
 
 function App() {
   const [columns, setColumns] = useState(initColumns);
   const [labels, setLabels] = useState([]);
   const [settings, setSettings] = useState(initSettings);
+	const [alarms, setAlarms] = useState({});
   const [currLabels, setCurrLabels] = useState({});
+	const [currDateAlarm, setCurrDateAlarm] = useState();
+	const [currTimeAlarm, setCurrTimeAlarm] = useState();
   const [inputExpanded, setInputExpanded] = useState(false);
   const [inputText, setInputText] = useState("");
   const [labelsListExpanded, setLabelsListExpanded] = useState(false);
@@ -67,34 +125,45 @@ function App() {
     let getColumns;
     let getLabels;
     let getSettings;
+		let getAlarms;
+
     try {
       chrome.storage.sync.get("columns", (data) => {
         if (!chrome.runtime.error) {
           getColumns = data.columns;
         }
-  
         if (getColumns && getColumns !== "undefined") {
           setColumns(getColumns);
         }
       });
+
       chrome.storage.sync.get("labels", (data) => {
         if (!chrome.runtime.error) {
           getLabels = data.labels;
         }
-  
         if (getLabels && getLabels !== "undefined") {
           setLabels(getLabels);
         }
       });
+
       chrome.storage.sync.get("settings", (data) => {
         if (!chrome.runtime.error) {
           getSettings = data.settings;
         }
-  
         if (getSettings && getSettings !== "undefined") {
           setSettings(getSettings);
         }
       });
+
+			chrome.storage.sync.get("alarms", (data) => {
+        if (!chrome.runtime.error) {
+          getAlarms = data.alarms;
+        }
+        if (getAlarms && getAlarms !== "undefined") {
+          setAlarms(getAlarms);
+        }
+      });
+
       setLoaded(true);
     } catch (error) {
       console.warn("Error syncing with chrome API. Are you using this as a webapp?");
@@ -129,28 +198,53 @@ function App() {
 
   useEffect(() => {
     // console.log(columns);
+		// Pull items
     try {
       chrome.storage.sync.set({
         "columns": columns,
         "labels": labels,
         "settings": settings,
-      }, function() {
+				"alarms": alarms,
+      }, () => {
         if (chrome.runtime.error) {
-          console.log("Runtime error. Failed to save data");
+          console.warn("Runtime error. Failed to save data");
         }
       });
     } catch (error) {
-      console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
+      console.warn("Error syncing storage with chrome extensions.");
     }
-		console.log(labels);
-  }, [columns, labels, settings])
+  }, [columns, labels, settings, alarms]);
 
+	useEffect(() => {
+		syncAlarms();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [alarms]);
+
+	// Keypress listener
   useEffect(() => {
     document.addEventListener("keydown", keyShortcutHandler);
     return () => {
       document.removeEventListener('keydown', keyShortcutHandler);
     };
   });
+
+	const syncAlarms = async () => {
+		try {
+			// Clear all alarms and recreate them
+			await chrome.alarms.clearAll();
+			// Note that alarmId and cardId are the same
+			Object.keys(alarms).forEach((alarmId) => {
+				if (!alarms[alarmId].notified) {
+					chrome.alarms.create(
+						alarmId,
+						{ when: new Date(alarms[alarmId].alarmDue).getTime() },
+					)
+				}
+			});			
+    } catch (error) {
+      console.warn("Error syncing alarms with chrome extensions.", error);
+    }
+	}
 
   const setEditing = (item) => {
     setEditingId(item.id);
@@ -159,19 +253,21 @@ function App() {
 
   const saveAndResetEditing = () => {
     onEditTask();
-    setEditingId();
-    setInputText("");
-    setCurrLabels({});
-    setStartedEditing(false);
+		resetInput();
   };
 
   const saveAndResetEditingHeader = () => {
     onEditHeader();
-    setEditingId();
+		resetInput();
+  };
+
+	const resetInput = () => {
+		setEditingId();
     setInputText("");
     setCurrLabels({});
+		clearCurrAlarm();
     setStartedEditing(false);
-  };
+	}
 
   const keyShortcutHandler = (e) => {
     if (e.code === "Space" && !labelsListExpanded && !inputExpanded && !isEditingId && !showSettings) {
@@ -183,7 +279,8 @@ function App() {
     } else if (e.code === "Backspace" && !isEditingId) {
       if(labelsListExpanded && labelText === "") {
         setLabelsListExpanded(!labelsListExpanded);
-      } else if (inputExpanded && inputText === "") {
+      } else if (inputExpanded && filterString(inputText) === "") {
+				resetInput();
         setInputExpanded(!inputExpanded);
       }
     } else if (e.code === "KeyS" && !labelsListExpanded && !inputExpanded && !isEditingId) {
@@ -200,7 +297,12 @@ function App() {
     // Delete
     if (destination.droppableId === "trash") {
       const sourceItems = currColumns.filter((column => column.title === source.droppableId))[0].items;
-      sourceItems.splice(source.index, 1);
+      const removedCard = sourceItems.splice(source.index, 1)[0];
+			// Remove associated alarm if exists
+			if (alarms[removedCard.id]) {
+				const { [removedCard.id]: deletedAlarm, ...remainingAlarms } = alarms;
+				setAlarms(remainingAlarms);
+			}
     } else {
       // Different column
       if (source.droppableId !== destination.droppableId) {
@@ -236,7 +338,6 @@ function App() {
         return {
           ...column,
           items: column.items.map(task => {
-						console.log(task);
             if (task.id === isEditingId) {
               if (inputText) {
                 return {
@@ -250,6 +351,8 @@ function App() {
           }).filter(task => task !== undefined),
         }
       });
+		
+		addOrEditCurrAlarmToAlarms(isEditingId);
     setColumns(currColumns);
   };
 
@@ -270,16 +373,68 @@ function App() {
 
   const addCurrLabel = (id, display) => {
     setCurrLabels({ ...currLabels, [id]: display });
-		console.log(currLabels);
   };
 
 	const removeCurrLabel = (id) => {
 		const { [id]: existingLabel, ...currLabelsEdited } = currLabels;
     setCurrLabels(currLabelsEdited);
 		// Remove label from text content too
-		console.log(inputText.replace(`@[${existingLabel}](${id})`, ""));
 		setInputText(inputText.replace(`@[${existingLabel}](${id})`, ""));
   };
+
+	const addDateToCurrAlarm = (id, display) => {
+		const dateRaw = id.replace("__DATE: ", "");
+		setCurrDateAlarm(dateRaw);
+		if (!currTimeAlarm) {
+			setCurrTimeAlarm("00:00");
+		}
+	}
+
+	const addTimeToCurrAlarm = (id, display) => {
+		// setInputText(inputText.replace(`@[${display}](${id})`, ""));
+		const timeRaw = id.replace("__TIME: ", "");
+		setCurrTimeAlarm(timeRaw);
+		if (!currDateAlarm) {
+			setCurrDateAlarm(moment().format("DD/MM/YYYY"))
+		}
+	}
+
+	const clearCurrAlarm = () => {
+		setCurrDateAlarm();
+		setCurrTimeAlarm();
+	}
+
+	const renderMentionsComponent = (placeholderText, className, onKeyFunction) => (
+		<MentionsInput 
+			value={inputText} 
+			onChange={e => setInputText(e.target.value)}
+			placeholder={placeholderText}
+			className={`mentions ${className}`}
+			onKeyDown={e => onKeyFunction(e)}
+			autoFocus
+			allowSpaceInQuery
+		>
+			<Mention
+				className="mentions__mention"
+				trigger="#"
+				data={labels.filter((label => !currLabels[label.id]))}
+				displayTransform={() => ""}
+				onAdd={(id, display) => addCurrLabel(id, display)}
+			/>
+			<Mention 
+				className="mentions__mention"
+				trigger="t:"
+				data={allTimes}
+				onAdd={(id, display) => addTimeToCurrAlarm(id, display)}
+			/>
+			<Mention 
+				className="mentions__mention"
+				trigger="d:"
+				data={allDays}
+				onAdd={(id, display) => addDateToCurrAlarm(id, display)}
+			/>
+		</MentionsInput>
+	);
 
   const renderInputBox = () => (
     <OutsideClickHandler 
@@ -287,27 +442,11 @@ function App() {
         setInputExpanded(false);
         setInputText("");
         setCurrLabels({});
+				clearCurrAlarm();
       }}
     >
       <div className="input-container">
-        <MentionsInput 
-          value={inputText} 
-          onChange={e => setInputText(e.target.value)}
-          placeholder="New task..."
-          className="mentions input-add"
-          onKeyDown={e => onAddCard(e)}
-          autoFocus
-          maxLength={100}
-          allowSpaceInQuery
-        >
-          <Mention
-            className="mentions__mention"
-            trigger="#"
-            data={labels.filter((label => !currLabels[label.id]))}
-            displayTransform={() => ""}
-            onAdd={(id, display) => addCurrLabel(id, display)}
-          />
-        </MentionsInput>
+				{renderMentionsComponent("New task...", "input-add", onAddCard)}
         {!!Object.values(currLabels).length && 
           <div className="curr-labels-container">
             {Object.keys(currLabels).map((keyLabel) => (
@@ -321,6 +460,14 @@ function App() {
             ))}
           </div>
         }
+				{(currDateAlarm && currTimeAlarm) && 
+					<div className="curr-labels-container curr-time-container">
+						<span className="curr-label-item">
+							<BellRingIcon size={16} style={{ marginRight: "6px" }} />
+							{moment(`${currDateAlarm} ${currTimeAlarm}`, "DD/MM/YYYY HH:mm").format("dddd DD/MM, h:mmA")}
+						</span>
+					</div>
+				}
       </div>
     </OutsideClickHandler>
   );
@@ -477,18 +624,45 @@ function App() {
     setLabels(labelsCopy);
   };
 
+	const addOrEditCurrAlarmToAlarms = (cardId) => {
+		if (currDateAlarm && currTimeAlarm) {
+			// Add alarm
+			const alarmDue = moment(`${currDateAlarm} ${currTimeAlarm}`, "DD/MM/YYYY HH:mm");
+			if (alarmDue.isValid) {
+				const alarmIsoString = alarmDue.toISOString(false);
+				setAlarms({
+					...alarms,
+					[cardId]: {
+						alarmDue: alarmIsoString,
+						notified: false,
+					}
+				})
+			} else {
+				console.warn(`Invalid time: ${alarmDue}`);
+			}
+		} else {
+			// Remove alarm if exists
+			const { [cardId]: currAlarm, ...remainingAlarms } = alarms;
+			setAlarms(remainingAlarms);
+		}
+	}
+
   const onAddCard = (e) => {
     if (e.key === "Enter" && filterString(inputText) !== "") {
+			const cardId = uuid();
       const columnsCopy = [...columns];
       columnsCopy[0].items.push({
-        id: uuid(),
+        id: cardId,
         content: inputText
       });
 
+			addOrEditCurrAlarmToAlarms(cardId);
+			// Reset inputting
       setColumns(columnsCopy);
       setInputExpanded(false);
       setInputText("");
       setCurrLabels({});
+			clearCurrAlarm();
     }
   };
 
@@ -543,6 +717,24 @@ function App() {
       </div>
     );
   }
+
+	const getAlarmForCard = (cardId) => {
+		if (alarms[cardId]) {
+			return (
+				<div 
+					className="curr-labels-container curr-time-container card-time-container"
+					style={{ backgroundColor: alarms[cardId].notified ? theme.delCol : theme.accentColored }}
+				>
+					<span className="curr-label-item">
+						<BellRingIcon size={16} style={{ marginRight: "6px" }} />
+						Due {moment(alarms[cardId].alarmDue).fromNow()}
+					</span>
+				</div>
+			);
+		} else {
+			return <></>;
+		}
+	};
 
   return (
     <div>
@@ -610,6 +802,7 @@ function App() {
                     {column.items.map((item, i) => {
                       if (isEditingId === item.id) {
                         if (!startedEditing) {
+													// Set curr labels
                           const itemLabels = {};
                           const itemLabelsRaw = item.content.match(labelRegex);
                           const itemLabelIds = itemLabelsRaw?.map(label => label.match(/\(.*\)/)[0].slice(1, -1))
@@ -622,6 +815,12 @@ function App() {
                           }
                           setCurrLabels(itemLabels ?? {});
                           setStartedEditing(true);
+													// Set curr alarm
+													const currAlarm = alarms[item.id];
+													if (currAlarm) {
+														setCurrDateAlarm(moment(currAlarm.alarmDue).format("DD/MM/YYYY"));
+														setCurrTimeAlarm(moment(currAlarm.alarmDue).format("HH:mm"));
+													}
                         }
                         return (
                           <OutsideClickHandler 
@@ -629,24 +828,7 @@ function App() {
                             onOutsideClick={() => saveAndResetEditing()}
                           >
                             <div className="input-container-inplace">
-                              <MentionsInput 
-                                value={inputText} 
-                                onChange={e => setInputText(e.target.value)}
-                                placeholder="Edit task..."
-                                className="mentions input-add-inplace"
-                                onKeyDown={e => onKeypressEditCard(e)}
-                                autoFocus
-                                maxLength={100}
-                                allowSpaceInQuery
-                              >
-                                <Mention
-                                  className="mentions__mention"
-                                  trigger="#"
-                                  data={labels.filter((label => !currLabels[label.id]))}
-                                  displayTransform={() => ""}
-                                  onAdd={(id, display) => addCurrLabel(id, display)}
-                                />
-                              </MentionsInput>
+															{renderMentionsComponent("Edit task...", "input-add-inplace", onKeypressEditCard)}
                               {!!Object.values(currLabels).length && 
                                 <div className="curr-labels-container">
                                   {Object.keys(currLabels).map((keyLabel) => (
@@ -664,6 +846,18 @@ function App() {
                                   ))}
                                 </div>
                               }
+															{(currDateAlarm && currTimeAlarm) && 
+                                <div className="curr-labels-container curr-time-container">
+																	<span className="curr-label-item">
+																		<BellRingIcon size={16} style={{ marginRight: "6px" }} />
+																		{moment(`${currDateAlarm} ${currTimeAlarm}`, "DD/MM/YYYY HH:mm").format("dddd DD/MM, h:mmA")}
+																		<CloseCirleIcon 
+																			onClick={() => clearCurrAlarm()} 
+																			className="remove-label-icon"
+																		/>
+																	</span>
+                                </div>
+                              }
                             </div>
                           </OutsideClickHandler>
                         );
@@ -678,13 +872,14 @@ function App() {
                                 style={{
                                   userSelect: 'none',
                                   backgroundColor: snapshot.isDragging ? theme.cardBgActiveCol : theme.cardBgCol,
-                                  ...provided.draggableProps.style
+                                  ...provided.draggableProps.style,
                                 }}
                                 className="draggable-card"
                                 onDoubleClick={() => setEditing(item)}
                               >
                                 {item.content.replace(labelRegex, '')}
                                 {getLabelsFromCard(item.content)}
+																{getAlarmForCard(item.id)}
                               </div>
                             )}
                           </Draggable>
@@ -699,22 +894,25 @@ function App() {
           ))}
           <Droppable droppableId="trash">
             {(provided, snapshot) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                style={{
-                  background: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
-                  width: snapshot.isDraggingOver ? "200px" : "20px"
-                }}
-                className="droppable-container droppable-trash"
-              > 
-                <DeleteForeverIcon color={theme.accent} className="delete-icon"/>
-                <span 
-                  className={`delete-me-text ${snapshot.isDraggingOver ? "transitioner" : ""}`}
-                >
-                  Delete forever
-                </span>
-              </div>
+							<div className="droppable-trash-parent">
+								<div
+									{...provided.droppableProps}
+									ref={provided.innerRef}
+									style={{
+										background: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
+										width: snapshot.isDraggingOver ? "200px" : "20px",
+										height: snapshot.isDraggingOver ? "200px" : "23px",
+									}}
+									className="droppable-container droppable-trash"
+								> 
+									<DeleteForeverIcon color={theme.accent} className="delete-icon"/>
+									<span 
+										className={`delete-me-text ${snapshot.isDraggingOver ? "transitioner" : ""}`}
+									>
+										Remove task
+									</span>
+								</div>
+							</div>
             )}  
           </Droppable>
         </DragDropContext>
