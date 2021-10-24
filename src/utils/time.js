@@ -23,7 +23,7 @@ const formatTimeToMention = (items) => items.map((item) => (
 	{ id: `__TIME: ${convertAmPmTimeTo24Hour(item)}`, display: item }
 ));
 const timeHours = [12, ...[...Array(11).keys()].map((i) => ++i)];
-const timeMins = [...Array(2).keys()].map((i) => i * 30);
+const timeMins = [...Array(12).keys()].map((i) => i * 5);
 
 const times = timeHours.flatMap(timeHour => 
 	timeMins.map((timeMin) => `${timeHour}:${timeMin.toString().length === 1 ? `${timeMin}0` : timeMin }`)

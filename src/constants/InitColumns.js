@@ -21,7 +21,11 @@ const initColumns = [
     items: [
       {
         id: "t4",
-        content: "🖱️ Double click a task or header to edit."
+        content: "🖱️ Double click a task or column title to edit."
+      },
+			{
+        id: "t5",
+        content: "⏰ Type t: and d: to add a due time and date to your tasks. You can do this while creating a new task or editing an existing one."
       },
     ]
   },

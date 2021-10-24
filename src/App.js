@@ -49,60 +49,6 @@ import moment from 'moment';
 
 const currYear = new Date().getFullYear();
 
-// Alarm listener
-chrome.alarms.onAlarm.addListener((alarm) => {
-	try {
-		chrome.storage.sync.get("columns", (data) => {
-			if (!chrome.runtime.error) {
-				const columns = data.columns;
-				columns.forEach((column) => {
-					column.items.forEach((card) => {
-						if (card.id === alarm.name) {
-							// Create notif
-							const timeFrom = moment(new Date(alarm.scheduledTime)).fromNow();
-							chrome.notifications.create(
-								card.id, 
-								{ 
-									title: "Task is due", 
-									message: `${filterString(card.content)} was due ${timeFrom}.`, 
-									type: "basic", 
-									iconUrl: "./logo-small.png" 
-								},
-								() => {}
-							);
-							try {
-								chrome.storage.sync.get("alarms", (data) => {
-									if (!chrome.runtime.error) {
-										const alarms = {
-											...data.alarms,
-											[alarm.name]: {
-												...data.alarms[alarm.name],
-												notified: true,
-											},
-										};
-										chrome.storage.sync.set({
-											"alarms": alarms,
-										}, () => {
-											if (chrome.runtime.error) {
-												console.warn("Runtime error. Failed to save edited alarms.");
-											}
-										});
-									}
-								})
-							} catch (error) {
-								console.warn("Error syncing storage with chrome extensions.");
-							}
-						}
-					});
-					return;
-				});
-			}
-		});
-	} catch (error) {
-		console.warn("Could not trigger alarm.");
-	}
-});
-
 function App() {
   const [columns, setColumns] = useState(initColumns);
   const [labels, setLabels] = useState([]);
@@ -548,7 +494,11 @@ function App() {
           </div>
           <div className="shortcut-item">
             <span><i>#</i></span>
-            <span>Add a label to a task (when creating/editing task)</span>
+            <span>Add a label to a task (while typing)</span>
+          </div>
+					<div className="shortcut-item">
+            <span><i>t: / d:</i></span>
+            <span>Add a due time/day to a task (while typing)</span>
           </div>
           <div className="shortcut-item">
             <span><i>double click</i></span>
