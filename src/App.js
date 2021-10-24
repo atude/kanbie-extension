@@ -49,6 +49,60 @@ import moment from 'moment';
 
 const currYear = new Date().getFullYear();
 
+// Alarm listener
+chrome.alarms.onAlarm.addListener((alarm) => {
+	try {
+		chrome.storage.sync.get("columns", (data) => {
+			if (!chrome.runtime.error) {
+				const columns = data.columns;
+				columns.forEach((column) => {
+					column.items.forEach((card) => {
+						if (card.id === alarm.name) {
+							// Create notif
+							const timeFrom = moment(new Date(alarm.scheduledTime)).fromNow();
+							chrome.notifications.create(
+								card.id, 
+								{ 
+									title: "Task is due", 
+									message: `${filterString(card.content)} was due ${timeFrom}.`, 
+									type: "basic", 
+									iconUrl: "./logo-small.png" 
+								},
+								() => {}
+							);
+							try {
+								chrome.storage.sync.get("alarms", (data) => {
+									if (!chrome.runtime.error) {
+										const alarms = {
+											...data.alarms,
+											[alarm.name]: {
+												...data.alarms[alarm.name],
+												notified: true,
+											},
+										};
+										chrome.storage.sync.set({
+											"alarms": alarms,
+										}, () => {
+											if (chrome.runtime.error) {
+												console.warn("Runtime error. Failed to save edited alarms.");
+											}
+										});
+									}
+								})
+							} catch (error) {
+								console.warn("Error syncing storage with chrome extensions.");
+							}
+						}
+					});
+					return;
+				});
+			}
+		});
+	} catch (error) {
+		console.warn("Could not trigger alarm.");
+	}
+});
+
 function App() {
   const [columns, setColumns] = useState(initColumns);
   const [labels, setLabels] = useState([]);
@@ -71,6 +125,8 @@ function App() {
     let getColumns;
     let getLabels;
     let getSettings;
+		let getAlarms;
+
     try {
       chrome.storage.sync.get("columns", (data) => {
         if (!chrome.runtime.error) {
@@ -96,6 +152,15 @@ function App() {
         }
         if (getSettings && getSettings !== "undefined") {
           setSettings(getSettings);
+        }
+      });
+
+			chrome.storage.sync.get("alarms", (data) => {
+        if (!chrome.runtime.error) {
+          getAlarms = data.alarms;
+        }
+        if (getAlarms && getAlarms !== "undefined") {
+          setAlarms(getAlarms);
         }
       });
 
@@ -133,27 +198,53 @@ function App() {
 
   useEffect(() => {
     // console.log(columns);
+		// Pull items
     try {
       chrome.storage.sync.set({
         "columns": columns,
         "labels": labels,
         "settings": settings,
-      }, function() {
+				"alarms": alarms,
+      }, () => {
         if (chrome.runtime.error) {
           console.warn("Runtime error. Failed to save data");
         }
       });
     } catch (error) {
-      console.warn("Error syncing with chrome extensions. Are you using this as a webapp?");
+      console.warn("Error syncing storage with chrome extensions.");
     }
-  }, [columns, labels, settings])
+  }, [columns, labels, settings, alarms]);
 
+	useEffect(() => {
+		syncAlarms();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [alarms]);
+
+	// Keypress listener
   useEffect(() => {
     document.addEventListener("keydown", keyShortcutHandler);
     return () => {
       document.removeEventListener('keydown', keyShortcutHandler);
     };
   });
+
+	const syncAlarms = async () => {
+		try {
+			// Clear all alarms and recreate them
+			await chrome.alarms.clearAll();
+			// Note that alarmId and cardId are the same
+			Object.keys(alarms).forEach((alarmId) => {
+				if (!alarms[alarmId].notified) {
+					chrome.alarms.create(
+						alarmId,
+						{ when: new Date(alarms[alarmId].alarmDue).getTime() },
+					)
+				}
+			});			
+    } catch (error) {
+      console.warn("Error syncing alarms with chrome extensions.", error);
+    }
+	}
 
   const setEditing = (item) => {
     setEditingId(item.id);
@@ -206,7 +297,12 @@ function App() {
     // Delete
     if (destination.droppableId === "trash") {
       const sourceItems = currColumns.filter((column => column.title === source.droppableId))[0].items;
-      sourceItems.splice(source.index, 1);
+      const removedCard = sourceItems.splice(source.index, 1)[0];
+			// Remove associated alarm if exists
+			if (alarms[removedCard.id]) {
+				const { [removedCard.id]: deletedAlarm, ...remainingAlarms } = alarms;
+				setAlarms(remainingAlarms);
+			}
     } else {
       // Different column
       if (source.droppableId !== destination.droppableId) {
@@ -529,17 +625,16 @@ function App() {
   };
 
 	const addOrEditCurrAlarmToAlarms = (cardId) => {
-		// TODO: sync alarms to chrome api
 		if (currDateAlarm && currTimeAlarm) {
 			// Add alarm
 			const alarmDue = moment(`${currDateAlarm} ${currTimeAlarm}`, "DD/MM/YYYY HH:mm");
 			if (alarmDue.isValid) {
 				const alarmIsoString = alarmDue.toISOString(false);
-				console.log(alarmIsoString);
 				setAlarms({
 					...alarms,
 					[cardId]: {
 						alarmDue: alarmIsoString,
+						notified: false,
 					}
 				})
 			} else {
@@ -626,7 +721,10 @@ function App() {
 	const getAlarmForCard = (cardId) => {
 		if (alarms[cardId]) {
 			return (
-				<div className="curr-labels-container curr-time-container card-time-container">
+				<div 
+					className="curr-labels-container curr-time-container card-time-container"
+					style={{ backgroundColor: alarms[cardId].notified ? theme.delCol : theme.accentColored }}
+				>
 					<span className="curr-label-item">
 						<BellRingIcon size={16} style={{ marginRight: "6px" }} />
 						Due {moment(alarms[cardId].alarmDue).fromNow()}
@@ -717,14 +815,9 @@ function App() {
                           }
                           setCurrLabels(itemLabels ?? {});
                           setStartedEditing(true);
-
 													// Set curr alarm
 													const currAlarm = alarms[item.id];
 													if (currAlarm) {
-														console.log(currAlarm.alarmDue);
-														console.log(moment(currAlarm.alarmDue).format("DD/MM/YYYY"));
-														console.log(moment(currAlarm.alarmDue).format("HH:mm"));
-
 														setCurrDateAlarm(moment(currAlarm.alarmDue).format("DD/MM/YYYY"));
 														setCurrTimeAlarm(moment(currAlarm.alarmDue).format("HH:mm"));
 													}
