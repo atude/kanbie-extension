@@ -51,5 +51,3 @@ export const allDays = [
 	}),
 ];
 
-console.log("MOMENT!");
-console.log(allDays);

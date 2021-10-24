@@ -359,20 +359,27 @@ body {
   font-size: small;
   display: flex;
   flex-direction: row;
+	flex-wrap: wrap;
 }
 
 .curr-label-item {
   padding: 2px 6px;
-  margin: 0 2px;
+  margin: 2px 2px;
   border-radius: 10px;
 	display: flex;
 	align-items: center;
 }
 
 .curr-time-container {
+	border-top: none;
 	background-color: var(--accentColored);
 	border-radius: 8px;
 	padding: 3px;
+}
+
+.card-time-container {
+	margin: 12px -12px -12px -12px;
+	padding: 6px 3px;
 }
 
 .card-label-container {
