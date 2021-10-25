@@ -5,7 +5,7 @@ import { badge } from "../constants/Colors";
 // Update badge for due tasks
 // Note: Uses alarm object from chrome storage, not alarm from chrome alarms api
 export const updateBadge = (alarms) => {
-	if (alarms && Object.values(alarms).length) {
+	if (alarms && Object.values(alarms).length !== undefined) {
 		const totalDueTasks = Object.values(alarms).reduce(
 			(totalNotified, currAlarm) => totalNotified += moment(currAlarm.alarmDue).isBefore() ? 1 : 0, 0
 		);

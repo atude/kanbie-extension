@@ -20,8 +20,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-		"prebuild": "rimraf build",
 		"build": "yarn build:app && yarn build:bg && yarn zip",
+		"build:clean": "rimraf build && yarn build",
     "build:app": "INLINE_RUNTIME_CHUNK=false react-scripts build",
 		"build:bg": "webpack --mode production --config webpack.bg.config.js",
     "build:watch": "watch 'yarn build' ./src",

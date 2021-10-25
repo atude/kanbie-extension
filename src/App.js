@@ -163,7 +163,14 @@ function App() {
   }, [columns, labels, settings, alarms]);
 
 	useEffect(() => {
+		updateAlarms();
+		updateBadge(alarms);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [columns]);
+
+	useEffect(() => {
 		syncAlarms();
+		updateBadge(alarms);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [alarms]);
 
@@ -174,6 +181,19 @@ function App() {
       document.removeEventListener('keydown', keyShortcutHandler);
     };
   });
+
+	// Reupdate alarms whenever a card is modified
+	const updateAlarms = () => {
+		let newAlarms = {};
+		columns.forEach((column) => [
+			column.items.forEach((card) => {
+				if (alarms[card.id]) {
+					newAlarms[card.id] = alarms[card.id]; 
+				}
+			})
+		]);
+		setAlarms(newAlarms);
+	}
 
 	const syncAlarms = async () => {
 		try {
@@ -188,7 +208,6 @@ function App() {
 					)
 				}
 			});
-			updateBadge(alarms);
     } catch (error) {
       console.warn("Error syncing alarms with chrome extensions.", error);
     }
@@ -275,6 +294,7 @@ function App() {
   const onDeleteAllDone = () => {
     const currColumns = [...columns];
     const sourceItems = currColumns[2].items;
+		// Delete items and set
     sourceItems.splice(0, sourceItems.length);
     setColumns(currColumns);
   };
