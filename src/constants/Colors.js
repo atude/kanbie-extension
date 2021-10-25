@@ -10,6 +10,10 @@ export const colorPanelColors = [
   "#ff303055",
 ];
 
+export const badge = {
+	color: "#cc2727",
+};
+
 export const themes = {
   dark: {
     accent: "#fff",

@@ -46,6 +46,7 @@ import BellRingIcon from 'mdi-react/BellRingIcon';
 import { filterString, labelRegex, maxItems } from './utils/generic';
 import { allDays, allTimes } from './utils/time';
 import moment from 'moment';
+import { updateBadge } from './utils/badge';
 
 const currYear = new Date().getFullYear();
 
@@ -186,7 +187,8 @@ function App() {
 						{ when: new Date(alarms[alarmId].alarmDue).getTime() },
 					)
 				}
-			});			
+			});
+			updateBadge(alarms);
     } catch (error) {
       console.warn("Error syncing alarms with chrome extensions.", error);
     }
@@ -670,14 +672,15 @@ function App() {
 
 	const getAlarmForCard = (cardId) => {
 		if (alarms[cardId]) {
+			const dueTime = moment(alarms[cardId].alarmDue);
 			return (
 				<div 
 					className="curr-labels-container curr-time-container card-time-container"
-					style={{ backgroundColor: alarms[cardId].notified ? theme.delCol : theme.accentColored }}
+					style={{ backgroundColor: dueTime.isBefore() ? theme.delCol : theme.accentColored }}
 				>
 					<span className="curr-label-item">
 						<BellRingIcon size={16} style={{ marginRight: "6px" }} />
-						Due {moment(alarms[cardId].alarmDue).fromNow()}
+						Due {dueTime.fromNow()}
 					</span>
 				</div>
 			);
@@ -848,12 +851,16 @@ function App() {
 								<div
 									{...provided.droppableProps}
 									ref={provided.innerRef}
+									className="droppable-container droppable-trash"
+								/>
+								{/* Dummy placeholder */}
+								<div
 									style={{
 										background: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
 										width: snapshot.isDraggingOver ? "200px" : "20px",
 										height: snapshot.isDraggingOver ? "200px" : "23px",
 									}}
-									className="droppable-container droppable-trash"
+									className="droppable-trash-placeholder"
 								> 
 									<DeleteForeverIcon color={theme.accent} className="delete-icon"/>
 									<span 

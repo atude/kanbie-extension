@@ -1,5 +1,6 @@
 /*global chrome*/
 import moment from "moment";
+import { updateBadge } from "./utils/badge";
 import { filterStringIncludeSpace } from "./utils/generic";
 
 // Alarm listener
@@ -26,6 +27,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 							try {
 								chrome.storage.sync.get("alarms", (data) => {
 									if (!chrome.runtime.error) {
+										// Set to notified
 										const alarms = {
 											...data.alarms,
 											[alarm.name]: {
@@ -33,6 +35,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 												notified: true,
 											},
 										};
+										// Update badge
+										updateBadge(alarms);
 										chrome.storage.sync.set({
 											"alarms": alarms,
 										}, () => {
