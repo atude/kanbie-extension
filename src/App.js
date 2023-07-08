@@ -1,12 +1,6 @@
 /*global chrome*/
 
 /* 
-
-  TODO
-
-	- Alarm functionality - schedule due dates for tasks
-  - More themes
- 
   MAINTENANCE
 
   - Refactor -> abstract functions, components, etx
@@ -14,7 +8,6 @@
   - Fix up mutations -> make sure functions are not mutating/using ref instead of copy
   - Use reducers to clean up logic
   - Convert to TS
-
 */
 
 import React, { useState, useEffect } from 'react';
@@ -69,53 +62,41 @@ function App() {
 
   // Load data
   useEffect(() => {
-    let getColumns;
-    let getLabels;
-    let getSettings;
-		let getAlarms;
+		const initLoad = async () => {
+			try {
+				const getColumns = await chrome.storage.sync.get("columns");
+				const getLabels = await chrome.storage.sync.get("labels");
+				const getSettings = await chrome.storage.sync.get("settings");
+				const getAlarms = await chrome.storage.sync.get("alarms");
 
-    try {
-      chrome.storage.sync.get("columns", (data) => {
-        if (!chrome.runtime.error) {
-          getColumns = data.columns;
-        }
-        if (getColumns && getColumns !== "undefined") {
-          setColumns(getColumns);
-        }
-      });
+				if (chrome.runtime.error) {
+					throw Error("runtime error");
+				}
 
-      chrome.storage.sync.get("labels", (data) => {
-        if (!chrome.runtime.error) {
-          getLabels = data.labels;
-        }
-        if (getLabels && getLabels !== "undefined") {
-          setLabels(getLabels);
-        }
-      });
+				if (getColumns.columns && getColumns.columns !== "undefined") {
+					setColumns(getColumns.columns);
+				}
+	
+				if (getLabels.labels && getLabels.labels !== "undefined") {
+					setLabels(getLabels.labels);
+				}
+	
+				if (getSettings.settings && getSettings.settings !== "undefined") {
+					setSettings(getSettings.settings);
+				}
+	
+				if (getAlarms.alarms && getAlarms.alarms !== "undefined") {
+					setAlarms(getAlarms.alarms);
+				}
+	
+				setLoaded(true);
+			} catch (error) {
+				console.warn("Error syncing with chrome API. Are you using this as a webapp?");
+				setLoaded(true);
+			}
+		}
 
-      chrome.storage.sync.get("settings", (data) => {
-        if (!chrome.runtime.error) {
-          getSettings = data.settings;
-        }
-        if (getSettings && getSettings !== "undefined") {
-          setSettings(getSettings);
-        }
-      });
-
-			chrome.storage.sync.get("alarms", (data) => {
-        if (!chrome.runtime.error) {
-          getAlarms = data.alarms;
-        }
-        if (getAlarms && getAlarms !== "undefined") {
-          setAlarms(getAlarms);
-        }
-      });
-
-      setLoaded(true);
-    } catch (error) {
-      console.warn("Error syncing with chrome API. Are you using this as a webapp?");
-      setLoaded(true);
-    }
+		initLoad();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);  
 
@@ -144,22 +125,24 @@ function App() {
   }, [settings]);
 
   useEffect(() => {
-    // console.log(columns);
-		// Pull items
-    try {
-      chrome.storage.sync.set({
-        "columns": columns,
-        "labels": labels,
-        "settings": settings,
-				"alarms": alarms,
-      }, () => {
-        if (chrome.runtime.error) {
-          console.warn("Runtime error. Failed to save data");
-        }
-      });
-    } catch (error) {
-      console.warn("Error syncing storage with chrome extensions.");
-    }
+		// Pull items. Only pull if initial load succeeded to prevent bad overrides.
+		if (loaded) {
+			try {
+				chrome.storage.sync.set({
+					"columns": columns,
+					"labels": labels,
+					"settings": settings,
+					"alarms": alarms,
+				}, () => {
+					if (chrome.runtime.error) {
+						console.warn("Runtime error. Failed to save data");
+					}
+				});
+			} catch (error) {
+				console.warn("Error syncing storage with chrome extensions.");
+			}
+		}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columns, labels, settings, alarms]);
 
 	useEffect(() => {

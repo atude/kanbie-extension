@@ -38,16 +38,13 @@ export const allDays = [
 	{ id: `__DATE: ${moment().add(1, 'days').format("DD/MM/YYYY")}`, display: "Tomorrow" },
 	...[...Array(12).keys()].map((i) => {
 		const dayDate = moment().add(2 + i, 'days');
-		if (i < 5) {
-			return {
-				id: `__DATE: ${dayDate.format("DD/MM/YYYY")}`,
-				display: `${dayDate.format("dddd")} ${dayDate.format("DD/MM")}`,
-			}
-		} 
+		const formattedDate = dayDate.format("DD/MM/YYYY");
+		const amPm = dayDate.format("DD/MM");
+		const formattedDisplay = `${i < 5 ? '' : 'Next '}${dayDate.format("dddd")} ${amPm}`;
 		return {
-			id: `__DATE: ${dayDate.format("DD/MM/YYYY")}`,
-			display: `Next ${dayDate.format("dddd")} ${dayDate.format("DD/MM")}`,
-		}
+			id: `__DATE: ${formattedDate}`,
+			display: formattedDisplay,
+		};
 	}),
 ];
 
