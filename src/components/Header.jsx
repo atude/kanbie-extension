@@ -7,8 +7,8 @@ export function Header({ hideKanbieText }) {
       <img
         alt="logo"
         src={KanbieLogo}
-        width={28}
-        className={hideKanbieText ? 'header kanbie-logo-color' : 'kanbie-logo kanbie-logo-color'}
+        width={24}
+        className="kanbie-logo kanbie-logo-color"
       />
       {!hideKanbieText && <div className="header">kanbie</div>}
     </div>
@@ -16,4 +16,3 @@ export function Header({ hideKanbieText }) {
 }
 
 export default Header;
-

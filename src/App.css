@@ -1,145 +1,277 @@
+/* ============================================
+   Kanbie — Chrome Extension Popup Styles
+   ============================================ */
+
+/* --- Design Tokens --- */
 :root {
-  --bg1: #25292b;
-  --bg2: #1e2123;
-  --bg3: #333;
+  --bg1: #1a1d21;
+  --bg2: #22262a;
+  --bg3: #2e3338;
   --accent: #fff;
   --accentColored: #80266e;
   --accentColoredBright: #ed39c9;
   --accentColoredDark: #9b2e85;
   --accentDelete: #9b2e2e;
-  --shadow: rgba(0, 0, 0, 0.3);
-	--kanbie-logo-hue-rotate: 180deg;
-	--kanbie-logo-grayscale: 0;
+  --shadow: rgba(0, 0, 0, 0.25);
+  --kanbie-logo-hue-rotate: 0deg;
+  --kanbie-logo-grayscale: 0;
+  --radius-sm: 8px;
+  --radius-md: 12px;
 }
 
+/* --- Scrollbar --- */
 ::-webkit-scrollbar {
-  position: absolute;
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg1);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg2); 
+  background: var(--bg3);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accentColored); 
+  background: var(--accentColored);
 }
 
+/* --- Base --- */
 body {
-  overflow-x: hidden;
+  overflow: hidden;
   width: 700px;
   height: 520px;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg1);
-  font-size: medium;
+  font-size: 13px;
+  color: var(--accent);
+  margin: 0;
 }
 
+/* --- App Root --- */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  overflow: hidden;
+}
+
+/* --- Logo --- */
 .kanbie-logo {
-  margin: -10px;
-  padding-top: 3px;
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 
 .kanbie-logo-color {
-	filter: hue-rotate(var(--kanbie-logo-hue-rotate)) grayscale(var(--kanbie-logo-grayscale));
+  filter: hue-rotate(var(--kanbie-logo-hue-rotate)) grayscale(var(--kanbie-logo-grayscale));
+}
+
+/* --- Toolbar --- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: var(--bg2);
+  border-bottom: 1px solid var(--bg3);
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .header-container {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .header {
-  text-align: center;
-  font-size: 20px;
-  padding: 20px;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--accentColoredBright);
-  font-weight: 200;
+  letter-spacing: -0.3px;
+  padding: 0;
+  margin: 0;
 }
 
+/* --- Toolbar Action Buttons --- */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background-color: var(--accentColored);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  border: none;
+  outline: none;
+}
+
+.toolbar-btn:hover {
+  background-color: var(--accentColoredDark);
+}
+
+.toolbar-btn:active {
+  transform: scale(0.92);
+}
+
+.toolbar-btn-danger:hover {
+  background-color: var(--accentDelete);
+}
+
+/* --- Main Container --- */
 .main-container {
   display: flex;
-  justify-content: center;
-  height: 1000px;
+  gap: 10px;
+  padding: 12px 14px;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
 }
 
+/* --- Column Wrapper --- */
+.column-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-width: 0;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+
+/* --- Column Header --- */
 .column-header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 12px 14px 8px;
+  flex-shrink: 0;
 }
 
 .column-heading {
   color: var(--accent);
-  margin: 4px;
-  padding-left: 4px;
-  padding-top: 2px;
-  padding-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
   overflow: hidden;
-  text-overflow: clip;
-  max-width: 160px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .column-heading-editing {
   color: var(--accent);
-  padding-left: 4px;
-  margin-bottom: 10px;
-  border: 2px solid var(--accentColoredDark);
-  box-shadow: 1px 1px 4px var(--shadow);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border: 1px solid var(--accentColoredDark);
+  box-shadow: 0 0 0 3px rgba(237, 57, 201, 0.12);
   background-color: var(--bg1);
-  border-radius: 4px;
+  border-radius: 6px;
   outline: none;
+  padding: 4px 8px;
+  width: 120px;
+  font-family: inherit;
 }
 
-.droppable-container {
-  width: 200px;
-  border-radius: 10px;
-  padding: 10px;
-  margin-left: 4px;
-  margin-right: 4px;
-  box-shadow: 1px 1px 4px var(--shadow);
-  margin-bottom: 20px;
-  transition: all 0.2s;
+.column-count {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.35;
+  min-width: 12px;
+  text-align: center;
 }
 
+.column-icon {
+  opacity: 0.5;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* --- Column Drop Area --- */
+/* When inside .column-wrapper, override base .droppable-container */
+.column-wrapper .droppable-container {
+  width: auto;
+  border-radius: 0;
+  padding: 4px 10px 10px;
+  margin: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.column-wrapper .column-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 0;
+  margin-top: 0;
+  border-style: solid;
+  transition: border-color 0.2s ease;
+}
+
+/* --- Task Cards --- */
+.draggable-card {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  box-shadow: 0 1px 3px var(--shadow);
+  color: var(--accent);
+  font-size: 12.5px;
+  line-height: 1.5;
+  word-break: break-word;
+  border-left: 3px solid var(--accentColoredBright);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: grab;
+}
+
+.draggable-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* --- Trash Droppable --- */
 .droppable-trash {
   width: 200px;
-	padding-top: 50px;
-  position: absolute;
-  top: 0;
-  right: 50px;
-  margin: 12px 12px 0px 0px;
-	visibility: hidden;
-	transition: none;
-}
-
-.droppable-trash-placeholder {
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 1px 1px 4px var(--shadow);
-  position: absolute;
-  top: 0;
-  right: 50px;
-  margin: 12px;
-  transition: all 0.2s;
-}
-
-.droppable-clear-all {
-  width: 20px;
+  padding-top: 50px;
   position: absolute;
   top: 0;
   right: 0;
-  margin: 12px;
-  background-color: var(--bg2);
+  margin: 0;
+  visibility: hidden;
+  transition: none;
 }
 
-.droppable-clear-all:hover {
-  background-color: var(--accentDelete);
-  cursor: pointer;
+.droppable-trash-placeholder {
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  box-shadow: 0 4px 16px var(--shadow);
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 20;
 }
 
 .delete-me-text {
@@ -151,6 +283,8 @@ body {
   margin-top: -20px;
   margin-left: 100px;
   overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .transitioner {
@@ -161,200 +295,122 @@ body {
   transition: opacity 0.35s ease-in;
 }
 
-.column-container {
-  min-height: 400px;
-  padding-top: 50px;
-  margin-top: -62px;
-  border-style: solid;
-}
-
-.draggable-card {
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  box-shadow: 1px 1px 4px var(--shadow);
-  color: var(--accent);
-  font-size: smaller;
-  word-break: break-word;
-}
-
+/* --- Icon Helpers --- */
 .delete-icon {
-  margin-bottom: -5px;
-  margin-left: -2px;
+  margin-bottom: -3px;
 }
 
 .delete-all-icon {
-  margin-bottom: -5px;
-  margin-left: -2px;
+  margin: 0;
 }
 
-
 .add-icon {
-  margin-top: -1px;
-  margin-left: -2px;
+  margin: 0;
 }
 
 .button-icon {
   transform: scale(1);
+  cursor: pointer;
 }
 
 .button-icon:active {
   transform: scale(0.9);
 }
 
-.add-button-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 12px;
-  width: 20px;
-  height: 20px;
-}
-
-.add-button-container:active {
-  transform: scale(0.9);
-}
-
-.add-button-container:not(:hover) {
-  background-color: var(--accentColored);
-  transition: all 0.1s;
-}
-
-.add-button-container:hover {
-  background-color: var(--accentColoredDark);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-
-.labels-button-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 12px;
-  margin-left: 60px;
-  width: 20px;
-  height: 20px;
-}
-
-.labels-button-container:active {
-  transform: scale(0.9);
-}
-
-.labels-button-container:not(:hover) {
-  background-color: var(--accentColored);
-  transition: all 0.1s;
-}
-
-.labels-button-container:hover {
-  background-color: var(--accentColoredDark);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-
+/* --- Remove Label Icon --- */
 .remove-label-icon {
-	padding-left: 4px;
-	width: 20px;
-	height: 20px;
-	filter: brightness(1.4);
+  padding-left: 4px;
+  width: 18px;
+  height: 18px;
+  filter: brightness(1.4);
+  cursor: pointer;
 }
 
 .remove-label-icon:hover {
-	filter: brightness(1);
+  filter: brightness(1);
 }
 
 .remove-label-icon:active {
-	transform: scale(0.9);
-}
-
-.settings-button-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 12px;
-  margin-left: 108px;
-  width: 20px;
-  height: 20px;
-}
-
-.settings-button-container:active {
   transform: scale(0.9);
 }
 
-.settings-button-container:not(:hover) {
-  background-color: var(--accentColored);
-  transition: all 0.1s;
-}
-
-.settings-button-container:hover {
-  background-color: var(--accentColoredDark);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-
-
+/* --- Task Input Modal --- */
 .input-container {
   position: absolute;
   top: 0;
   left: 0;
-  margin-left: 10px;
-  margin-top: 60px;
-  border: 2px solid var(--accentColoredDark);
-  box-shadow: 1px 1px 4px var(--shadow);
+  margin-left: 14px;
+  margin-top: 8px;
+  border: 1px solid var(--accentColoredDark);
+  box-shadow: 0 4px 24px var(--shadow);
   background-color: var(--bg1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
+  z-index: 30;
+  overflow: hidden;
 }
 
 .input-container-inplace {
-  margin-bottom: 8px;
-  border: 2px solid var(--accentColoredDark);
-  box-shadow: 1px 1px 4px var(--shadow);
+  margin-bottom: 6px;
+  border: 1px solid var(--accentColoredDark);
+  box-shadow: 0 0 0 3px rgba(237, 57, 201, 0.12);
   background-color: var(--bg1);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
 .input-add {
   background-color: var(--bg1);
-  min-height: 100px;
-  border-radius: 10px;
+  min-height: 80px;
+  border-radius: var(--radius-md);
   width: 220px;
 }
 
 .input-add-inplace {
   background-color: var(--bg1);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   width: 100%;
 }
 
+/* --- Labels Drawer --- */
 .labels-list {
   position: absolute;
   top: 0;
   left: 0;
   background-color: var(--bg1);
-  padding: 2px;
-  border: 2px solid var(--accentColoredDark);
-  margin-top: 60px;
-  margin-left: 60px;
-  padding: 8px;
+  border: 1px solid var(--accentColoredDark);
+  box-shadow: 0 4px 24px var(--shadow);
+  margin-top: 8px;
+  margin-left: 14px;
+  padding: 10px;
   color: var(--accent);
   width: max-content;
-  border-radius: 10px;
-  transform: none;
-  max-height: 300px;
+  min-width: 200px;
+  border-radius: var(--radius-md);
+  max-height: 340px;
   overflow-y: auto;
+  z-index: 30;
 }
 
 .label-item {
-  font-size: smaller;
-  margin: 4px;
+  font-size: 12px;
+  margin: 2px 0;
+  padding: 4px 4px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  border-radius: 6px;
+  transition: background-color 0.1s ease;
+}
+
+.label-item:hover {
+  background-color: var(--bg3);
 }
 
 .label-item-text {
-  padding: 4px 6px;
+  padding: 3px 8px;
   border-radius: 6px;
+  font-size: 12px;
 }
 
 .label-item-action-container {
@@ -363,67 +419,73 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-}
-
-.curr-labels-container {
-  border-top: 1px solid var(--bg3);
-  padding: 8px 4px;
-  margin-top: 2px;
-  color: var(--accent);
-  font-size: small;
-  display: flex;
-  flex-direction: row;
-	flex-wrap: wrap;
-}
-
-.curr-label-item {
-  padding: 2px 6px;
-  margin: 2px 2px;
-  border-radius: 10px;
-	display: flex;
-	align-items: center;
-}
-
-.curr-time-container {
-	border-top: none;
-	background-color: var(--accentColored);
-	border-radius: 8px;
-	padding: 3px;
-}
-
-.card-time-container {
-	margin: 12px -12px -12px -12px;
-	padding: 6px 3px;
-}
-
-.card-label-container {
-  padding-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  margin: -3px;
-  margin-right: -6px;
-}
-
-.card-label-item {
-  margin-top: 4px;
-  margin-right: 3px;
-  border-radius: 10px;
-  padding: 3px 6px;
-  font-size: small;
+  gap: 2px;
 }
 
 .label-input {
   border: 1px solid var(--bg3);
 }
 
- /* --> Styles required from react-mentions */
+/* --- Current Labels in Input --- */
+.curr-labels-container {
+  border-top: 1px solid var(--bg3);
+  padding: 8px 6px;
+  margin-top: 2px;
+  color: var(--accent);
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.curr-label-item {
+  padding: 2px 8px;
+  margin: 0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+}
+
+/* --- Alarm / Time Container --- */
+.curr-time-container {
+  border-top: none;
+  background-color: var(--accentColored);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+}
+
+.card-time-container {
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* --- Card Labels --- */
+.card-label-container {
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.card-label-item {
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* --- Mentions Input (react-mentions style overrides) --- */
 .mentions__control {
-  font-family: 'Roboto', sans-serif;
-  font-size: smaller;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 12.5px;
   margin-left: 4px;
   margin-right: 4px;
 }
+
 .mentions__highlighter {
   padding: 8px;
   width: 100%;
@@ -431,22 +493,30 @@ body {
   white-space: pre-wrap;
   outline: none;
 }
+
 .mentions__input {
   border: none;
   outline: none;
   padding: 8px;
-  outline: none;
   color: var(--accent);
+  font-family: inherit;
 }
+
 .mentions__suggestions__list {
   background-color: var(--bg1);
-  box-shadow: 2px 2px 8px 0px var(--shadow);
+  box-shadow: 0 4px 16px var(--shadow);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--bg3);
 }
+
 .mentions__suggestions__item {
-  padding: 5px 10px;
+  padding: 6px 12px;
   color: var(--accent);
-  font-size: smaller;
+  font-size: 12px;
+  transition: background-color 0.1s ease;
 }
+
 .mentions__suggestions__item--focused {
   background-color: var(--bg3);
 }

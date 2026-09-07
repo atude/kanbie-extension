@@ -1,10 +1,12 @@
 import React from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import OutsideClickHandler from 'react-outside-click-handler';
-import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
-import CheckboxMarkedCircleIcon from 'mdi-react/CheckboxMarkedCircleIcon';
+import CircleOutlineIcon from 'mdi-react/CircleOutlineIcon';
 import ProgressCheckIcon from 'mdi-react/ProgressCheckIcon';
+import CheckCircleOutlineIcon from 'mdi-react/CheckCircleOutlineIcon';
 import Card from './Card';
+
+const columnIcons = [CircleOutlineIcon, ProgressCheckIcon, CheckCircleOutlineIcon];
 
 export function Column({
   column,
@@ -30,16 +32,12 @@ export function Column({
   alarms,
   theme,
 }) {
-  const columnIconProps = {
-    size: 24,
-    color: theme.accent,
-    style: { marginBottom: '8px' },
-  };
-
   const isEditingHeader = isEditingId === column.title;
+  const IconComponent = columnIcons[colIndex] || CircleOutlineIcon;
+  const itemCount = column.items.length;
 
   return (
-    <div>
+    <div className="column-wrapper" style={{ backgroundColor: theme.columnBgColor }}>
       <div className="column-header-container">
         {isEditingHeader ? (
           <OutsideClickHandler onOutsideClick={saveAndResetEditingHeader}>
@@ -60,13 +58,13 @@ export function Column({
               setEditingId(column.title);
             }}
           >
-            {column?.newTitle || column.title}
+            <span className="column-icon">
+              <IconComponent size={15} color={theme.accentColoredBright} />
+            </span>
+            <span>{column?.newTitle || column.title}</span>
+            <span className="column-count">{itemCount}</span>
           </div>
         )}
-
-        {colIndex === 0 && <CheckboxMarkedCircleOutlineIcon {...columnIconProps} />}
-        {colIndex === 1 && <ProgressCheckIcon {...columnIconProps} />}
-        {colIndex === 2 && <CheckboxMarkedCircleIcon {...columnIconProps} />}
       </div>
 
       <Droppable droppableId={column.title}>
@@ -77,7 +75,6 @@ export function Column({
             style={{
               borderColor: theme.columnBorderColor,
               borderWidth: snapshot.isDraggingOver ? '2px' : 0,
-              backgroundColor: theme.columnBgColor,
             }}
             className="droppable-container column-container"
           >
@@ -114,4 +111,3 @@ export function Column({
 }
 
 export default Column;
-

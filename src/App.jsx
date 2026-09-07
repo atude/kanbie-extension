@@ -287,8 +287,19 @@ function App() {
   };
 
   return (
-    <div>
-      <Header hideKanbieText={settings?.hideKanbieText} />
+    <div className="app-root">
+      <div className="toolbar">
+        <Header hideKanbieText={settings?.hideKanbieText} />
+        {loaded && (
+          <ActionButtons
+            theme={theme}
+            onClearAllDone={onDeleteAllDone}
+            onToggleInput={() => setInputExpanded((prev) => !prev)}
+            onToggleLabels={() => setLabelsListExpanded((prev) => !prev)}
+            onOpenSettings={() => setShowSettings(true)}
+          />
+        )}
+      </div>
 
       {loaded && (
         <div className="main-container">
@@ -322,14 +333,6 @@ function App() {
             ))}
             <TrashDroppable theme={theme} />
           </DragDropContext>
-
-          <ActionButtons
-            theme={theme}
-            onClearAllDone={onDeleteAllDone}
-            onToggleInput={() => setInputExpanded((prev) => !prev)}
-            onToggleLabels={() => setLabelsListExpanded((prev) => !prev)}
-            onOpenSettings={() => setShowSettings(true)}
-          />
 
           {inputExpanded && (
             <TaskInputModal

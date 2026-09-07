@@ -1,42 +1,73 @@
+/* --- Settings Overlay --- */
 .settings-container {
-  position: absolute;
+  position: fixed;
   top: 0;
-  background-color: rgba(0, 0, 0, 0.9);
-  width: 700px;
-  height: 1200px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #fff;
-  flex-direction: column;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  z-index: 100;
+  overflow-y: auto;
 }
 
 .settings-content-container {
   text-align: center;
-  padding: 20px 10px;
+  padding: 28px 20px;
   color: #fff;
+  max-width: 500px;
+  width: 100%;
 }
 
-.settings-shortcuts-container, 
+.settings-shortcuts-container,
 .settings-themes-container,
 .settings-hidelogo-container {
   text-align: left;
-  width: 500px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.settings-subheader {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accentColoredBright);
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
 }
 
 .settings-select-content {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-evenly;
-  margin-bottom: 5px;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 
 .select-item {
   cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.15s ease;
+}
+
+.select-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .select-item-selected {
-  border-bottom: 2px solid var(--accentColoredBright);
+  background-color: var(--accentColored);
+  border-color: var(--accentColoredBright);
+  color: #fff;
 }
 
 .shortcut-item {
@@ -44,30 +75,47 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 5px;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.settings-subheader {
-  font-size: 20px;
-  color: var(--accentColoredBright);
+.shortcut-item:last-child {
+  border-bottom: none;
+}
+
+.shortcut-item i {
+  font-style: normal;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  padding: 3px 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  letter-spacing: 0.3px;
 }
 
 .copyright-header {
-  font-size: 14px;
-  opacity: 0.5;
+  font-size: 12px;
+  opacity: 0.4;
 }
 
 .settings-header {
-  font-size: 30px;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .close-button {
   position: absolute;
   top: 0;
   right: 0;
-  margin: 42px;
-  transform: scale(1);
+  margin: 24px;
   cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.close-button:hover {
+  opacity: 1;
 }
 
 .close-button:active {

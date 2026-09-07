@@ -10,7 +10,7 @@ export function TrashDroppable({ theme }) {
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="droppable-container droppable-trash"
+            className="droppable-trash"
           />
           <div
             style={{
@@ -20,7 +20,7 @@ export function TrashDroppable({ theme }) {
             }}
             className="droppable-trash-placeholder"
           >
-            <DeleteForeverIcon color={theme.accent} className="delete-icon" />
+            <DeleteForeverIcon color={theme.accent} size={18} className="delete-icon" />
             <span className={`delete-me-text ${snapshot.isDraggingOver ? 'transitioner' : ''}`}>
               Remove task
             </span>
@@ -32,4 +32,3 @@ export function TrashDroppable({ theme }) {
 }
 
 export default TrashDroppable;
-

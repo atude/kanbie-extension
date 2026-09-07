@@ -12,38 +12,21 @@ export function ActionButtons({
   onOpenSettings,
 }) {
   return (
-    <>
-      <div
-        className="droppable-container droppable-clear-all button-icon"
-        onClick={onClearAllDone}
-        title="Clear all done tasks"
-      >
-        <NotificationClearAllIcon color={theme.accent} className="delete-all-icon" />
+    <div className="toolbar-actions">
+      <div className="toolbar-btn" onClick={onToggleInput} title="Add task (Space)">
+        <PlusIcon color={theme.accent} size={18} />
       </div>
-      <div
-        className="add-button-container droppable-container"
-        onClick={onToggleInput}
-        title="Add task"
-      >
-        <PlusIcon color={theme.accent} className="add-icon" />
+      <div className="toolbar-btn" onClick={onToggleLabels} title="Manage labels (L)">
+        <LabelMultipleIcon color={theme.accent} size={18} />
       </div>
-      <div
-        className="labels-button-container droppable-container"
-        onClick={onToggleLabels}
-        title="Manage labels"
-      >
-        <LabelMultipleIcon color={theme.accent} className="add-icon" />
+      <div className="toolbar-btn" onClick={onOpenSettings} title="Settings (S)">
+        <CogIcon color={theme.accent} size={18} />
       </div>
-      <div
-        className="settings-button-container droppable-container"
-        onClick={onOpenSettings}
-        title="Settings"
-      >
-        <CogIcon color={theme.accent} className="add-icon" />
+      <div className="toolbar-btn toolbar-btn-danger" onClick={onClearAllDone} title="Clear all done tasks">
+        <NotificationClearAllIcon color={theme.accent} size={18} />
       </div>
-    </>
+    </div>
   );
 }
 
 export default ActionButtons;
-
