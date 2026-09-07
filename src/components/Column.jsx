@@ -11,28 +11,17 @@ const columnIcons = [CircleOutlineIcon, ProgressCheckIcon, CheckCircleOutlineIco
 export function Column({
   column,
   colIndex,
-  isEditingId,
-  setEditingId,
+  isEditingHeader,
+  onStartEditingHeader,
   inputText,
   setInputText,
   onKeypressEditHeader,
   saveAndResetEditingHeader,
   onStartEditingCard,
-  onSaveEditingCard,
-  onKeypressEditCard,
-  currLabels,
-  removeCurrLabel,
-  addCurrLabel,
-  currDateAlarm,
-  currTimeAlarm,
-  clearCurrAlarm,
-  addDateToCurrAlarm,
-  addTimeToCurrAlarm,
   labels,
   alarms,
   theme,
 }) {
-  const isEditingHeader = isEditingId === column.title;
   const IconComponent = columnIcons[colIndex] || CircleOutlineIcon;
   const itemCount = column.items.length;
 
@@ -61,10 +50,7 @@ export function Column({
             ) : (
               <div
                 className="column-heading"
-                onDoubleClick={() => {
-                  setInputText(column.newTitle || column.title);
-                  setEditingId(column.title);
-                }}
+                onDoubleClick={onStartEditingHeader}
               >
                 <span className="column-icon">
                   <IconComponent size={15} color={theme.accentColoredBright} />
@@ -85,20 +71,7 @@ export function Column({
                 key={item.id}
                 item={item}
                 index={i}
-                isEditing={isEditingId === item.id}
                 onStartEditing={onStartEditingCard}
-                onSaveEditing={onSaveEditingCard}
-                inputText={inputText}
-                setInputText={setInputText}
-                onKeypressEditCard={onKeypressEditCard}
-                currLabels={currLabels}
-                removeCurrLabel={removeCurrLabel}
-                addCurrLabel={addCurrLabel}
-                currDateAlarm={currDateAlarm}
-                currTimeAlarm={currTimeAlarm}
-                clearCurrAlarm={clearCurrAlarm}
-                addDateToCurrAlarm={addDateToCurrAlarm}
-                addTimeToCurrAlarm={addTimeToCurrAlarm}
                 labels={labels}
                 alarms={alarms}
                 theme={theme}

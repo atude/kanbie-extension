@@ -34,7 +34,8 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [labelsListExpanded, setLabelsListExpanded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [isEditingId, setEditingId] = useState();
+  const [editingCardId, setEditingCardId] = useState();
+  const [editingHeaderTitle, setEditingHeaderTitle] = useState();
   const [isDragging, setIsDragging] = useState(false);
 
   // Current task label & alarm draft states
@@ -77,7 +78,8 @@ function App() {
   }, [columns, cleanOrphanedAlarms]);
 
   const resetInput = () => {
-    setEditingId(undefined);
+    setEditingCardId(undefined);
+    setEditingHeaderTitle(undefined);
     setInputText('');
     setCurrLabels({});
     setCurrDateAlarm(undefined);
@@ -85,7 +87,7 @@ function App() {
   };
 
   useKeyboardShortcuts({
-    isEditingId,
+    isEditingId: editingHeaderTitle,
     showSettings,
     setShowSettings,
     inputExpanded,
@@ -205,24 +207,39 @@ function App() {
   };
 
   const onAddCard = (e) => {
-    if (e.key === 'Enter' && filterString(inputText) !== '') {
-      const cardId = uuid();
-      const newCard = { id: cardId, content: inputText };
+    if (e && e.key && e.key !== 'Enter') return;
+    if (e && e.shiftKey) return;
+    if (filterString(inputText) === '') return;
+    if (e && e.preventDefault) e.preventDefault();
 
-      setColumns((prev) =>
-        prev.map((col, idx) =>
-          idx === 0 ? { ...col, items: [...col.items, newCard] } : col
-        )
-      );
+    const cardId = uuid();
+    const newCard = { id: cardId, content: inputText };
 
-      addOrEditAlarm(cardId, currDateAlarm, currTimeAlarm);
-      setInputExpanded(false);
-      resetInput();
+    setColumns((prev) =>
+      prev.map((col, idx) =>
+        idx === 0 ? { ...col, items: [...col.items, newCard] } : col
+      )
+    );
+
+    addOrEditAlarm(cardId, currDateAlarm, currTimeAlarm);
+    setInputExpanded(false);
+    resetInput();
+  };
+
+  const toggleCurrLabel = (label) => {
+    if (currLabels[label.id]) {
+      removeCurrLabel(label.id);
+    } else {
+      addCurrLabel(label.id, label.display);
+      setInputText((prev) => {
+        const token = `@[${label.display}](${label.id})`;
+        return prev.includes(token) ? prev : `${prev} ${token}`.trim();
+      });
     }
   };
 
   const onStartEditingCard = (item) => {
-    setEditingId(item.id);
+    setEditingCardId(item.id);
     setInputText(item.content);
 
     const itemLabels = {};
@@ -246,17 +263,23 @@ function App() {
       setCurrDateAlarm(undefined);
       setCurrTimeAlarm(undefined);
     }
+
+    setInputExpanded(true);
   };
 
-  const onSaveEditingCard = () => {
-    if (!isEditingId) return;
+  const onSaveEditingCard = (e) => {
+    if (e && e.key && e.key !== 'Enter') return;
+    if (e && e.shiftKey) return;
+    if (filterString(inputText) === '') return;
+    if (e && e.preventDefault) e.preventDefault();
+    if (!editingCardId) return;
 
     setColumns((prev) =>
       prev.map((col) => ({
         ...col,
         items: col.items
           .map((task) =>
-            task.id === isEditingId
+            task.id === editingCardId
               ? filterString(inputText) !== ''
                 ? { ...task, content: inputText }
                 : null
@@ -266,23 +289,29 @@ function App() {
       }))
     );
 
-    addOrEditAlarm(isEditingId, currDateAlarm, currTimeAlarm);
+    addOrEditAlarm(editingCardId, currDateAlarm, currTimeAlarm);
+    setInputExpanded(false);
     resetInput();
   };
 
-  const onKeypressEditCard = (e) => {
-    if (e.key === 'Enter') {
-      onSaveEditingCard();
-    } else if (e.key === 'Escape') {
-      resetInput();
-    }
+  const onDeleteEditingCard = () => {
+    if (!editingCardId) return;
+    removeAlarm(editingCardId);
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        items: col.items.filter((task) => task.id !== editingCardId),
+      }))
+    );
+    setInputExpanded(false);
+    resetInput();
   };
 
   const onSaveEditingHeader = () => {
-    if (!isEditingId) return;
+    if (!editingHeaderTitle) return;
     setColumns((prev) =>
       prev.map((col) =>
-        col.title === isEditingId ? { ...col, newTitle: inputText || '' } : col
+        col.title === editingHeaderTitle ? { ...col, newTitle: inputText || '' } : col
       )
     );
     resetInput();
@@ -322,23 +351,16 @@ function App() {
                 key={column.title}
                 column={column}
                 colIndex={colIndex}
-                isEditingId={isEditingId}
-                setEditingId={setEditingId}
+                isEditingHeader={editingHeaderTitle === column.title}
+                onStartEditingHeader={() => {
+                  setInputText(column.newTitle || column.title);
+                  setEditingHeaderTitle(column.title);
+                }}
                 inputText={inputText}
                 setInputText={setInputText}
                 onKeypressEditHeader={onKeypressEditHeader}
                 saveAndResetEditingHeader={onSaveEditingHeader}
                 onStartEditingCard={onStartEditingCard}
-                onSaveEditingCard={onSaveEditingCard}
-                onKeypressEditCard={onKeypressEditCard}
-                currLabels={currLabels}
-                removeCurrLabel={removeCurrLabel}
-                addCurrLabel={addCurrLabel}
-                currDateAlarm={currDateAlarm}
-                currTimeAlarm={currTimeAlarm}
-                clearCurrAlarm={clearCurrAlarm}
-                addDateToCurrAlarm={addDateToCurrAlarm}
-                addTimeToCurrAlarm={addTimeToCurrAlarm}
                 labels={labels}
                 alarms={alarms}
                 theme={theme}
@@ -352,15 +374,23 @@ function App() {
               inputText={inputText}
               setInputText={setInputText}
               labels={labels}
+              setLabels={setLabels}
               currLabels={currLabels}
               addCurrLabel={addCurrLabel}
               removeCurrLabel={removeCurrLabel}
+              toggleCurrLabel={toggleCurrLabel}
               currDateAlarm={currDateAlarm}
               currTimeAlarm={currTimeAlarm}
+              setCurrDateAlarm={setCurrDateAlarm}
+              setCurrTimeAlarm={setCurrTimeAlarm}
               clearCurrAlarm={clearCurrAlarm}
               addDateToCurrAlarm={addDateToCurrAlarm}
               addTimeToCurrAlarm={addTimeToCurrAlarm}
               onAddCard={onAddCard}
+              onSaveCard={onSaveEditingCard}
+              onDeleteCard={onDeleteEditingCard}
+              isEditing={Boolean(editingCardId)}
+              theme={theme}
               onClose={() => {
                 setInputExpanded(false);
                 resetInput();

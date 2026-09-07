@@ -62,13 +62,16 @@ export function useKeyboardShortcuts({
         }
       }
 
-      // Backspace: Dismiss empty open input or label drawer
+      // Backspace: Dismiss empty open drawer or input only if not typing in an input element
       if (e.code === 'Backspace') {
-        if (isLabelsOpen && labelText === '') {
-          setLabelsListExpanded(false);
-        } else if (isInputOpen && filterString(inputText) === '') {
-          resetInput();
-          setInputExpanded(false);
+        const isFormElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+        if (!isFormElement) {
+          if (isLabelsOpen && labelText === '') {
+            setLabelsListExpanded(false);
+          } else if (isInputOpen && filterString(inputText) === '') {
+            resetInput();
+            setInputExpanded(false);
+          }
         }
       }
     };
