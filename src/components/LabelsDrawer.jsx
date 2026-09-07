@@ -39,15 +39,13 @@ export function LabelsDrawer({ labels, setLabels, onClose, theme }) {
     <OutsideClickHandler onOutsideClick={onClose}>
       <div className="labels-list">
         <input
-          className="mentions__input"
+          className="mentions__input label-input"
           type="text"
           pattern="[a-zA-Z0-9\s]+"
-          style={{ backgroundColor: 'transparent' }}
           placeholder="Add label..."
           maxLength={24}
           autoFocus
           value={labelText}
-          // Don't allow brackets since it's needed for label parsing
           onChange={(e) => setLabelText(e.target.value.replace(/[[\]()]/g, ''))}
           onKeyDown={onAddLabel}
         />
@@ -58,14 +56,18 @@ export function LabelsDrawer({ labels, setLabels, onClose, theme }) {
             </span>
             <span className="label-item-action-container">
               <FormatColorFillIcon
+                size={16}
                 onClick={() => shiftLabelColor(label.id)}
-                style={{ color: 'grey', marginTop: '6px' }}
+                title="Change color"
                 className="button-icon"
+                style={{ color: theme.accent, opacity: 0.7 }}
               />
               <CloseIcon
+                size={16}
                 onClick={() => deleteLabel(label.id)}
-                style={{ color: 'grey' }}
+                title="Delete label"
                 className="button-icon"
+                style={{ color: theme.delCol, opacity: 0.8 }}
               />
             </span>
           </div>
@@ -76,4 +78,3 @@ export function LabelsDrawer({ labels, setLabels, onClose, theme }) {
 }
 
 export default LabelsDrawer;
-

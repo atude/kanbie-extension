@@ -22,6 +22,7 @@
 /* --- Scrollbar --- */
 ::-webkit-scrollbar {
   width: 4px;
+  height: 0px;
 }
 
 ::-webkit-scrollbar-track {
@@ -128,6 +129,11 @@ body {
   background-color: var(--accentDelete);
 }
 
+.toolbar-btn-active {
+  background-color: var(--accentColoredDark);
+  box-shadow: 0 0 0 2px var(--accentColoredBright);
+}
+
 /* --- Main Container --- */
 .main-container {
   display: flex;
@@ -136,7 +142,8 @@ body {
   flex: 1;
   min-height: 0;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* --- Column Wrapper --- */
@@ -145,9 +152,10 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-md);
-  overflow: hidden;
   min-width: 0;
   box-shadow: 0 1px 4px var(--shadow);
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
 }
 
 /* --- Column Header --- */
@@ -220,11 +228,9 @@ body {
 .column-wrapper .column-container {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   padding-top: 0;
   margin-top: 0;
-  border-style: solid;
-  transition: border-color 0.2s ease;
 }
 
 /* --- Task Cards --- */
@@ -247,7 +253,19 @@ body {
   box-shadow: 0 4px 12px var(--shadow);
 }
 
+.card-text {
+  word-break: break-word;
+  line-height: 1.4;
+}
+
 /* --- Trash Droppable --- */
+.droppable-trash-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 20;
+}
+
 .droppable-trash {
   width: 200px;
   padding-top: 50px;
@@ -274,25 +292,15 @@ body {
   z-index: 20;
 }
 
-.delete-me-text {
-  height: 0;
-  width: 0;
-  opacity: 0;
-  color: var(--accent);
-  position: absolute;
-  margin-top: -20px;
-  margin-left: 100px;
-  overflow: hidden;
-  font-size: 12px;
-  font-weight: 500;
+.droppable-trash-active {
+  transform: scale(1.04);
 }
 
-.transitioner {
-  display: inherit;
-  width: 100px;
-  height: auto;
-  opacity: 1;
-  transition: opacity 0.35s ease-in;
+.delete-me-text {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* --- Icon Helpers --- */
@@ -369,6 +377,7 @@ body {
   background-color: var(--bg1);
   border-radius: var(--radius-sm);
   width: 100%;
+  min-height: 80px;
 }
 
 /* --- Labels Drawer --- */
@@ -424,6 +433,21 @@ body {
 
 .label-input {
   border: 1px solid var(--bg3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  background-color: transparent;
+  transition: border-color 0.15s ease;
+}
+
+.label-input:focus {
+  border-color: var(--accentColoredBright);
 }
 
 /* --- Current Labels in Input --- */

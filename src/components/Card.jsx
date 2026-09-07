@@ -1,7 +1,7 @@
 import React from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 import OutsideClickHandler from 'react-outside-click-handler';
-import CloseCirleIcon from 'mdi-react/CloseCircleIcon';
+import CloseCircleIcon from 'mdi-react/CloseCircleIcon';
 import BellRingIcon from 'mdi-react/BellRingIcon';
 import moment from 'moment';
 import { MentionsInput, Mention } from './MentionsInput';
@@ -70,7 +70,8 @@ export function Card({
                     key={keyLabel}
                   >
                     {currLabels[keyLabel]}
-                    <CloseCirleIcon
+                    <CloseCircleIcon
+                      size={14}
                       onClick={() => removeCurrLabel(keyLabel)}
                       className="remove-label-icon"
                     />
@@ -83,11 +84,15 @@ export function Card({
           {currDateAlarm && currTimeAlarm && (
             <div className="curr-labels-container curr-time-container">
               <span className="curr-label-item">
-                <BellRingIcon size={16} style={{ marginRight: '6px' }} />
+                <BellRingIcon size={14} style={{ marginRight: '6px' }} />
                 {moment(`${currDateAlarm} ${currTimeAlarm}`, 'DD/MM/YYYY HH:mm').format(
                   'dddd DD/MM, h:mmA'
                 )}
-                <CloseCirleIcon onClick={clearCurrAlarm} className="remove-label-icon" />
+                <CloseCircleIcon
+                  size={14}
+                  onClick={clearCurrAlarm}
+                  className="remove-label-icon"
+                />
               </span>
             </div>
           )}
@@ -102,7 +107,7 @@ export function Card({
   const dueTime = cardAlarm ? moment(cardAlarm.alarmDue) : null;
 
   return (
-    <Draggable key={item.id} draggableId={item.content + item.id} index={index}>
+    <Draggable key={item.id} draggableId={item.id} index={index}>
       {(provided, snapshot) => (
         <div
           {...provided.draggableProps}
@@ -116,7 +121,7 @@ export function Card({
           className="draggable-card"
           onDoubleClick={() => onStartEditing(item)}
         >
-          {item.content.replace(labelRegex, '')}
+          <div className="card-text">{item.content.replace(labelRegex, '')}</div>
 
           {filteredLabels && (
             <div className="card-label-container">
@@ -147,7 +152,7 @@ export function Card({
               style={{ backgroundColor: dueTime.isBefore() ? theme.delCol : theme.accentColored }}
             >
               <span className="curr-label-item">
-                <BellRingIcon size={16} style={{ marginRight: '6px' }} />
+                <BellRingIcon size={14} style={{ marginRight: '6px', flexShrink: 0 }} />
                 Due {dueTime.fromNow()}
               </span>
             </div>
@@ -159,4 +164,3 @@ export function Card({
 }
 
 export default Card;
-

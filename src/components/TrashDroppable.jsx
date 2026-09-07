@@ -2,11 +2,18 @@ import React from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import DeleteForeverIcon from 'mdi-react/DeleteForeverIcon';
 
-export function TrashDroppable({ theme }) {
+export function TrashDroppable({ theme, isDragging }) {
   return (
     <Droppable droppableId="trash">
       {(provided, snapshot) => (
-        <div className="droppable-trash-parent">
+        <div
+          className="droppable-trash-wrapper"
+          style={{
+            opacity: isDragging ? 1 : 0,
+            pointerEvents: isDragging ? 'auto' : 'none',
+            transition: 'opacity 0.2s ease',
+          }}
+        >
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
@@ -14,17 +21,16 @@ export function TrashDroppable({ theme }) {
           />
           <div
             style={{
-              background: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
-              width: snapshot.isDraggingOver ? '200px' : '20px',
-              height: snapshot.isDraggingOver ? '200px' : '23px',
+              backgroundColor: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
             }}
-            className="droppable-trash-placeholder"
+            className={`droppable-trash-placeholder ${snapshot.isDraggingOver ? 'droppable-trash-active' : ''}`}
           >
             <DeleteForeverIcon color={theme.accent} size={18} className="delete-icon" />
-            <span className={`delete-me-text ${snapshot.isDraggingOver ? 'transitioner' : ''}`}>
-              Remove task
+            <span className="delete-me-text">
+              {snapshot.isDraggingOver ? 'Drop to remove' : 'Remove task'}
             </span>
           </div>
+          {provided.placeholder}
         </div>
       )}
     </Droppable>

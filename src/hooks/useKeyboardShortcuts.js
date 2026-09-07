@@ -45,6 +45,23 @@ export function useKeyboardShortcuts({
         return;
       }
 
+      // Escape: Dismiss open modal, drawer, or input
+      if (e.code === 'Escape') {
+        if (showSettings) {
+          setShowSettings(false);
+          return;
+        }
+        if (isLabelsOpen) {
+          setLabelsListExpanded(false);
+          return;
+        }
+        if (isInputOpen) {
+          resetInput();
+          setInputExpanded(false);
+          return;
+        }
+      }
+
       // Backspace: Dismiss empty open input or label drawer
       if (e.code === 'Backspace') {
         if (isLabelsOpen && labelText === '') {

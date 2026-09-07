@@ -199,12 +199,11 @@ export function MentionsInput({
         placeholder={placeholder}
         style={{
           width: '100%',
-          minHeight: '80px',
           resize: 'none',
           background: 'transparent',
           boxSizing: 'border-box',
-          fontFamily: "'Roboto', sans-serif",
-          fontSize: 'smaller',
+          fontFamily: 'inherit',
+          fontSize: 'inherit',
         }}
       />
       {isOpen && suggestions.length > 0 && (
@@ -218,9 +217,6 @@ export function MentionsInput({
             zIndex: 1000,
             maxHeight: '160px',
             overflowY: 'auto',
-            borderRadius: '6px',
-            backgroundColor: 'var(--bg1)',
-            boxShadow: '0 4px 12px var(--shadow, rgba(0,0,0,0.15))',
           }}
         >
           <ul
@@ -240,7 +236,6 @@ export function MentionsInput({
                 }}
                 onMouseEnter={() => setSelectedIndex(idx)}
                 style={{
-                  padding: '6px 12px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -250,8 +245,8 @@ export function MentionsInput({
                 {item.color && (
                   <span
                     style={{
-                      width: '10px',
-                      height: '10px',
+                      width: '8px',
+                      height: '8px',
                       borderRadius: '50%',
                       backgroundColor: item.color,
                       flexShrink: 0,

@@ -7,46 +7,57 @@ const currYear = new Date().getFullYear();
 
 export function SettingsModal({ settings, setSettings, onClose, theme }) {
   return (
-    <div className="settings-container">
+    <div
+      className="settings-container"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="settings-content-container">
-        <div className="header-container">
-          <img alt="logo" src={KanbieLogo} width={60} className="kanbie-logo" />
+        <div className="header-container" style={{ justifyContent: 'center', marginBottom: '4px' }}>
+          <img alt="logo" src={KanbieLogo} width={32} className="kanbie-logo kanbie-logo-color" />
           <div className="header settings-header">kanbie</div>
         </div>
-        <div className="close-button" onClick={onClose}>
-          <CloseIcon color={theme.delCol} size={30} />
+        <div className="close-button" onClick={onClose} title="Close (Esc / S)">
+          <CloseIcon color={theme.accent} size={20} />
         </div>
-        <span className="copyright-header">atude (Mozamel Anwary) © {currYear}</span>
+        <div className="copyright-header" style={{ marginBottom: '20px' }}>
+          atude (Mozamel Anwary) &copy; {currYear}
+        </div>
 
         <div className="settings-shortcuts-container">
           <p className="settings-subheader">Shortcuts</p>
           <div className="shortcut-item">
-            <span><i>alt+k / opt+k</i></span>
             <span>Open Kanbie</span>
+            <span><i>alt+k / opt+k</i></span>
           </div>
           <div className="shortcut-item">
-            <span><i>space</i></span>
             <span>Create a new task</span>
+            <span><i>space</i></span>
           </div>
           <div className="shortcut-item">
+            <span>Manage labels</span>
             <span><i>l</i></span>
-            <span>Create a new label</span>
           </div>
           <div className="shortcut-item">
-            <span><i>s</i></span>
             <span>Open/close settings</span>
+            <span><i>s</i></span>
           </div>
           <div className="shortcut-item">
+            <span>Add label (while typing)</span>
             <span><i>#</i></span>
-            <span>Add a label to a task (while typing)</span>
           </div>
           <div className="shortcut-item">
+            <span>Add due time/day (while typing)</span>
             <span><i>t: / d:</i></span>
-            <span>Add a due time/day to a task (while typing)</span>
           </div>
           <div className="shortcut-item">
-            <span><i>double click</i></span>
             <span>Edit task or column header</span>
+            <span><i>double click</i></span>
+          </div>
+          <div className="shortcut-item">
+            <span>Close modal / cancel editing</span>
+            <span><i>esc</i></span>
           </div>
         </div>
 
@@ -88,4 +99,3 @@ export function SettingsModal({ settings, setSettings, onClose, theme }) {
 }
 
 export default SettingsModal;
-

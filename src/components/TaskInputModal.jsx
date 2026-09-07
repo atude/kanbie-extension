@@ -1,6 +1,7 @@
 import React from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import BellRingIcon from 'mdi-react/BellRingIcon';
+import CloseCircleIcon from 'mdi-react/CloseCircleIcon';
 import moment from 'moment';
 import { MentionsInput, Mention } from './MentionsInput';
 import { allDays, allTimes } from '../utils/time';
@@ -11,8 +12,10 @@ export function TaskInputModal({
   labels,
   currLabels,
   addCurrLabel,
+  removeCurrLabel,
   currDateAlarm,
   currTimeAlarm,
+  clearCurrAlarm,
   addDateToCurrAlarm,
   addTimeToCurrAlarm,
   onAddCard,
@@ -24,7 +27,7 @@ export function TaskInputModal({
         <MentionsInput
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="New task..."
+          placeholder="New task... (#label, t:time, d:day)"
           className="mentions input-add"
           onKeyDown={onAddCard}
           autoFocus
@@ -58,6 +61,13 @@ export function TaskInputModal({
                   key={keyLabel}
                 >
                   {currLabels[keyLabel]}
+                  {removeCurrLabel && (
+                    <CloseCircleIcon
+                      size={14}
+                      onClick={() => removeCurrLabel(keyLabel)}
+                      className="remove-label-icon"
+                    />
+                  )}
                 </span>
               );
             })}
@@ -67,9 +77,16 @@ export function TaskInputModal({
         {currDateAlarm && currTimeAlarm && (
           <div className="curr-labels-container curr-time-container">
             <span className="curr-label-item">
-              <BellRingIcon size={16} style={{ marginRight: '6px' }} />
+              <BellRingIcon size={14} style={{ marginRight: '6px' }} />
               {moment(`${currDateAlarm} ${currTimeAlarm}`, 'DD/MM/YYYY HH:mm').format(
                 'dddd DD/MM, h:mmA'
+              )}
+              {clearCurrAlarm && (
+                <CloseCircleIcon
+                  size={14}
+                  onClick={clearCurrAlarm}
+                  className="remove-label-icon"
+                />
               )}
             </span>
           </div>
@@ -80,4 +97,3 @@ export function TaskInputModal({
 }
 
 export default TaskInputModal;
-

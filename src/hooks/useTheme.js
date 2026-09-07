@@ -15,7 +15,8 @@ export function useTheme(settings) {
     root.style.setProperty('--accentColoredDark', theme.accentColoredDark);
     root.style.setProperty('--accentDelete', theme.delCol);
     root.style.setProperty('--shadow', theme.shadow);
-    root.style.setProperty('--kanbie-logo-hue-rotate', theme.kanbieLogoHueRotate);
+    const hueRotate = typeof theme.kanbieLogoHueRotate === 'number' ? `${theme.kanbieLogoHueRotate}deg` : theme.kanbieLogoHueRotate;
+    root.style.setProperty('--kanbie-logo-hue-rotate', hueRotate);
     root.style.setProperty('--kanbie-logo-grayscale', theme.kanbieLogoGrayscale);
   }, [theme]);
 

@@ -37,45 +37,47 @@ export function Column({
   const itemCount = column.items.length;
 
   return (
-    <div className="column-wrapper" style={{ backgroundColor: theme.columnBgColor }}>
-      <div className="column-header-container">
-        {isEditingHeader ? (
-          <OutsideClickHandler onOutsideClick={saveAndResetEditingHeader}>
-            <input
-              className="column-heading-editing"
-              autoFocus
-              onKeyDown={onKeypressEditHeader}
-              onChange={(e) => setInputText(e.target.value)}
-              value={inputText}
-              maxLength={14}
-            />
-          </OutsideClickHandler>
-        ) : (
-          <div
-            className="column-heading"
-            onDoubleClick={() => {
-              setInputText(column.newTitle || column.title);
-              setEditingId(column.title);
-            }}
-          >
-            <span className="column-icon">
-              <IconComponent size={15} color={theme.accentColoredBright} />
-            </span>
-            <span>{column?.newTitle || column.title}</span>
-            <span className="column-count">{itemCount}</span>
+    <Droppable droppableId={column.title}>
+      {(provided, snapshot) => (
+        <div
+          className="column-wrapper"
+          style={{
+            backgroundColor: theme.columnBgColor,
+            borderColor: snapshot.isDraggingOver ? theme.columnBorderColor : 'transparent',
+          }}
+        >
+          <div className="column-header-container">
+            {isEditingHeader ? (
+              <OutsideClickHandler onOutsideClick={saveAndResetEditingHeader}>
+                <input
+                  className="column-heading-editing"
+                  autoFocus
+                  onKeyDown={onKeypressEditHeader}
+                  onChange={(e) => setInputText(e.target.value)}
+                  value={inputText}
+                  maxLength={14}
+                />
+              </OutsideClickHandler>
+            ) : (
+              <div
+                className="column-heading"
+                onDoubleClick={() => {
+                  setInputText(column.newTitle || column.title);
+                  setEditingId(column.title);
+                }}
+              >
+                <span className="column-icon">
+                  <IconComponent size={15} color={theme.accentColoredBright} />
+                </span>
+                <span>{column?.newTitle || column.title}</span>
+                <span className="column-count" style={{ marginLeft: 'auto' }}>{itemCount}</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <Droppable droppableId={column.title}>
-        {(provided, snapshot) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            style={{
-              borderColor: theme.columnBorderColor,
-              borderWidth: snapshot.isDraggingOver ? '2px' : 0,
-            }}
             className="droppable-container column-container"
           >
             {column.items.map((item, i) => (
@@ -104,9 +106,9 @@ export function Column({
             ))}
             {provided.placeholder}
           </div>
-        )}
-      </Droppable>
-    </div>
+        </div>
+      )}
+    </Droppable>
   );
 }
 

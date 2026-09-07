@@ -35,6 +35,7 @@ function App() {
   const [labelsListExpanded, setLabelsListExpanded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isEditingId, setEditingId] = useState();
+  const [isDragging, setIsDragging] = useState(false);
 
   // Current task label & alarm draft states
   const [currLabels, setCurrLabels] = useState({});
@@ -131,7 +132,12 @@ function App() {
   };
 
   // Drag and drop handler
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
+
   const onDragEnd = (result) => {
+    setIsDragging(false);
     const { source, destination } = result;
     if (!destination) return;
 
@@ -267,6 +273,8 @@ function App() {
   const onKeypressEditCard = (e) => {
     if (e.key === 'Enter') {
       onSaveEditingCard();
+    } else if (e.key === 'Escape') {
+      resetInput();
     }
   };
 
@@ -283,6 +291,8 @@ function App() {
   const onKeypressEditHeader = (e) => {
     if (e.key === 'Enter' && filterString(inputText) !== '') {
       onSaveEditingHeader();
+    } else if (e.key === 'Escape') {
+      resetInput();
     }
   };
 
@@ -297,13 +307,16 @@ function App() {
             onToggleInput={() => setInputExpanded((prev) => !prev)}
             onToggleLabels={() => setLabelsListExpanded((prev) => !prev)}
             onOpenSettings={() => setShowSettings(true)}
+            inputExpanded={inputExpanded}
+            labelsListExpanded={labelsListExpanded}
+            showSettings={showSettings}
           />
         )}
       </div>
 
       {loaded && (
         <div className="main-container">
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DragDropContext onDragStart={handleDragStart} onDragEnd={onDragEnd}>
             {columns.map((column, colIndex) => (
               <Column
                 key={column.title}
@@ -331,7 +344,7 @@ function App() {
                 theme={theme}
               />
             ))}
-            <TrashDroppable theme={theme} />
+            <TrashDroppable theme={theme} isDragging={isDragging} />
           </DragDropContext>
 
           {inputExpanded && (
@@ -341,8 +354,10 @@ function App() {
               labels={labels}
               currLabels={currLabels}
               addCurrLabel={addCurrLabel}
+              removeCurrLabel={removeCurrLabel}
               currDateAlarm={currDateAlarm}
               currTimeAlarm={currTimeAlarm}
+              clearCurrAlarm={clearCurrAlarm}
               addDateToCurrAlarm={addDateToCurrAlarm}
               addTimeToCurrAlarm={addTimeToCurrAlarm}
               onAddCard={onAddCard}
