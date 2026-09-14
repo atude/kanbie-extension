@@ -21,7 +21,7 @@
 
 /* --- Scrollbar --- */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 2px;
   height: 0px;
 }
 
@@ -31,7 +31,7 @@
 
 ::-webkit-scrollbar-thumb {
   background: var(--bg3);
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -161,8 +161,7 @@ textarea,
   flex: 1;
   min-height: 0;
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 /* --- Column Wrapper --- */
@@ -172,6 +171,7 @@ textarea,
   flex-direction: column;
   border-radius: var(--radius-md);
   min-width: 0;
+  min-height: 0;
   box-shadow: 0 1px 4px var(--shadow);
   border: 2px solid transparent;
   transition: border-color 0.2s ease;
@@ -243,6 +243,14 @@ textarea,
 }
 
 /* --- Column Drop Area --- */
+.column-content-wrapper {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 /* When inside .column-wrapper, override base .droppable-container */
 .column-wrapper .droppable-container {
   width: auto;
@@ -259,12 +267,56 @@ textarea,
 .column-wrapper .column-container {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
-  padding-top: 0;
+  overflow-y: auto;
+  overflow-y: overlay;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 6px 10px 10px;
   margin-top: 0;
   user-select: none;
   -webkit-user-select: none;
   cursor: default;
+}
+
+.column-wrapper .column-container::-webkit-scrollbar {
+  width: 2px;
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.column-wrapper .column-container::-webkit-scrollbar-track {
+  background: transparent;
+/* --- Column Overlay Scrollbar --- */
+.column-scrollbar-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.column-wrapper .column-container::-webkit-scrollbar-thumb {
+  background: var(--bg3);
+.column-scrollbar-thumb {
+  position: absolute;
+  right: 3px;
+  width: 2px;
+  background-color: var(--bg3);
+  border-radius: 2px;
+  cursor: grab;
+  transition: background-color 0.15s ease;
+}
+
+.column-wrapper .column-container::-webkit-scrollbar-thumb:hover {
+  background: var(--accentColored);
+.column-scrollbar-thumb:hover,
+.column-scrollbar-thumb:active {
+  background-color: var(--accentColoredBright);
+  cursor: grabbing;
 }
 
 /* --- Task Cards --- */
@@ -278,7 +330,6 @@ textarea,
   line-height: 1.5;
   word-break: break-word;
   /* border-left: 3px solid var(--accentColoredBright); */
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
   transition: box-shadow 0.15s ease;
   cursor: grab;
   user-select: none;
@@ -696,7 +747,7 @@ textarea,
   min-height: 40px;
   max-height: 80px;
   overflow-y: auto;
-  padding: 2px;
+  padding: 6px;
 }
 
 .task-modal-empty-hint {
@@ -942,6 +993,30 @@ textarea,
     opacity: 1;
     transform: scale(1);
   }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes modalScaleDown {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.task-modal-overlay.task-modal-closing {
+  animation: fadeOut 0.16s ease forwards;
+}
+
+.task-modal-container.task-modal-closing {
+  animation: modalScaleDown 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Backward compatibility / in-place card editing */

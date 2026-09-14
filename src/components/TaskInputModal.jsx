@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import BellRingIcon from 'mdi-react/BellRingIcon';
 import CalendarIcon from 'mdi-react/CalendarIcon';
 import ClockOutlineIcon from 'mdi-react/ClockOutlineIcon';
@@ -42,7 +42,16 @@ export function TaskInputModal({
   const [newLabelText, setNewLabelText] = useState('');
   const [newLabelColor, setNewLabelColor] = useState('');
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const containerRef = useRef(null);
+
+  const handleClose = useCallback(() => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 160);
+  }, [isClosing, onClose]);
 
   const colors = theme?.panelColors || colorPanelColors;
 
@@ -55,17 +64,17 @@ export function TaskInputModal({
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [onClose]);
+  }, [handleClose]);
 
   // Handle outside click
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -179,14 +188,14 @@ export function TaskInputModal({
   const canSubmit = filterString(inputText).trim() !== '';
 
   return (
-    <div className="task-modal-overlay" onClick={handleOverlayClick}>
-      <div className="task-modal-container" ref={containerRef}>
+    <div className={`task-modal-overlay${isClosing ? ' task-modal-closing' : ''}`} onClick={handleOverlayClick}>
+      <div className={`task-modal-container${isClosing ? ' task-modal-closing' : ''}`} ref={containerRef}>
         {/* Header */}
         <div className="task-modal-header">
           <div className="task-modal-title">
-            <span className={`task-modal-badge ${isEditing ? 'task-modal-badge-edit' : ''}`}>
-              {isEditing ? 'Edit' : 'New'}
-            </span>
+            {/* <span className={`task-modal-badge ${isEditing ? 'task-modal-badge-edit' : ''}`}>
+              {isEditing ? 'Editing' : 'New Task'}
+            </span> */}
             <span>{isEditing ? 'Edit Task' : 'Create Task'}</span>
           </div>
           <div className="task-modal-header-actions">
@@ -194,7 +203,7 @@ export function TaskInputModal({
             <button
               type="button"
               className="task-modal-close-btn"
-              onClick={onClose}
+              onClick={handleClose}
               title="Close (Esc)"
             >
               <CloseIcon size={20} />
@@ -457,7 +466,7 @@ export function TaskInputModal({
             <button
               type="button"
               className="task-modal-btn task-modal-btn-secondary"
-              onClick={onClose}
+              onClick={handleClose}
             >
               Cancel
             </button>
