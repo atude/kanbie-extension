@@ -17,20 +17,17 @@ export function TrashDroppable({ theme, isDragging }) {
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="droppable-trash"
-          />
-          <div
             style={{
               backgroundColor: snapshot.isDraggingOver ? theme.delActiveCol : theme.delCol,
             }}
             className={`droppable-trash-placeholder ${snapshot.isDraggingOver ? 'droppable-trash-active' : ''}`}
           >
-            <DeleteForeverIcon color={theme.accent} size={18} className="delete-icon" />
+            <DeleteForeverIcon color={theme.accent} size={16} className="delete-icon" />
             <span className="delete-me-text">
               {snapshot.isDraggingOver ? 'Drop to remove' : 'Remove task'}
             </span>
+            <div style={{ display: 'none' }}>{provided.placeholder}</div>
           </div>
-          {provided.placeholder}
         </div>
       )}
     </Droppable>

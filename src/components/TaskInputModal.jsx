@@ -134,7 +134,7 @@ export function TaskInputModal({
       toggleCurrLabel(newLabel);
     } else if (addCurrLabel) {
       addCurrLabel(newLabel.id, newLabel.display);
-      setInputText((prev) => `${prev} @[${newLabel.display}](${newLabel.id})`.trim());
+      setInputText((prev) => `${prev.trim()} @[${newLabel.display}](${newLabel.id})`.trim());
     }
 
     setNewLabelText('');
@@ -209,26 +209,34 @@ export function TaskInputModal({
             <MentionsInput
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="What needs to be done? (#label, t:time, d:day)"
+              placeholder="What needs to be done? (l:label, d:day, t:time)"
               className="mentions task-modal-textarea"
               onKeyDown={handleKeyDown}
               autoFocus
             >
               <Mention
-                trigger="#"
+                trigger="l:"
+                isLabel
                 data={labels.filter((label) => !currLabels[label.id])}
                 displayTransform={() => ''}
                 onAdd={(id, display) => addCurrLabel(id, display)}
               />
               <Mention
-                trigger="t:"
-                data={allTimes}
-                onAdd={(id, display) => addTimeToCurrAlarm(id, display)}
+                trigger="#"
+                isLabel
+                data={labels.filter((label) => !currLabels[label.id])}
+                displayTransform={() => ''}
+                onAdd={(id, display) => addCurrLabel(id, display)}
               />
               <Mention
                 trigger="d:"
                 data={allDays}
                 onAdd={(id, display) => addDateToCurrAlarm(id, display)}
+              />
+              <Mention
+                trigger="t:"
+                data={allTimes}
+                onAdd={(id, display) => addTimeToCurrAlarm(id, display)}
               />
             </MentionsInput>
           </div>
@@ -348,8 +356,9 @@ export function TaskInputModal({
                         type="button"
                         className={`task-modal-label-item ${isSelected ? 'task-modal-label-selected' : ''}`}
                         style={{
-                          backgroundColor: isSelected ? label.color : `${label.color}44`,
+                          backgroundColor: label.color,
                           borderColor: label.color,
+                          opacity: isSelected ? 1 : 0.75,
                         }}
                         onClick={() => {
                           if (toggleCurrLabel) {

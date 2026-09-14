@@ -48,6 +48,18 @@ body {
   font-size: 13px;
   color: var(--accent);
   margin: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+/* Allow text selection only in form inputs and editable text */
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
 }
 
 /* --- App Root --- */
@@ -76,15 +88,19 @@ body {
   justify-content: space-between;
   padding: 10px 16px;
   background-color: var(--bg2);
-  border-bottom: 1px solid var(--bg3);
+  /* border-bottom: 1px solid var(--bg3); */
   flex-shrink: 0;
   z-index: 10;
+  position: relative;
 }
 
 .header-container {
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 .header {
@@ -94,6 +110,9 @@ body {
   letter-spacing: -0.3px;
   padding: 0;
   margin: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 /* --- Toolbar Action Buttons --- */
@@ -156,6 +175,9 @@ body {
   box-shadow: 0 1px 4px var(--shadow);
   border: 2px solid transparent;
   transition: border-color 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 /* --- Column Header --- */
@@ -176,11 +198,13 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: default;
+  cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .column-heading-editing {
@@ -205,6 +229,8 @@ body {
   opacity: 0.35;
   min-width: 12px;
   text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .column-icon {
@@ -212,6 +238,8 @@ body {
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* --- Column Drop Area --- */
@@ -223,6 +251,9 @@ body {
   margin: 0;
   box-shadow: none;
   margin-bottom: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 .column-wrapper .column-container {
@@ -231,6 +262,9 @@ body {
   overflow: hidden;
   padding-top: 0;
   margin-top: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 /* --- Task Cards --- */
@@ -243,9 +277,11 @@ body {
   font-size: 12.5px;
   line-height: 1.5;
   word-break: break-word;
-  border-left: 3px solid var(--accentColoredBright);
+  /* border-left: 3px solid var(--accentColoredBright); */
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .draggable-card:hover {
@@ -253,47 +289,52 @@ body {
   box-shadow: 0 4px 12px var(--shadow);
 }
 
+.draggable-card:active {
+  cursor: grabbing;
+}
+
 .card-text {
   word-break: break-word;
   line-height: 1.4;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.draggable-card:active .card-text {
+  cursor: grabbing;
 }
 
 /* --- Trash Droppable --- */
 .droppable-trash-wrapper {
   position: absolute;
-  top: 0;
-  right: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 20;
-}
-
-.droppable-trash {
-  width: 200px;
-  padding-top: 50px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 0;
-  visibility: hidden;
-  transition: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .droppable-trash-placeholder {
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  box-shadow: 0 4px 16px var(--shadow);
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 8px;
-  transition: all 0.2s ease;
+  border-radius: 20px;
+  padding: 6px 16px;
+  box-shadow: 0 2px 10px var(--shadow);
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, padding 0.15s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  z-index: 20;
+  justify-content: center;
+  gap: 6px;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
 }
 
 .droppable-trash-active {
-  transform: scale(1.04);
+  transform: scale(1.08);
+  padding: 7px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
 }
 
 .delete-me-text {
@@ -301,11 +342,22 @@ body {
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* --- Icon Helpers --- */
 .delete-icon {
-  margin-bottom: -3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .delete-all-icon {
@@ -664,7 +716,7 @@ body {
   color: #fff;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   user-select: none;
   font-family: inherit;
 }
@@ -672,6 +724,7 @@ body {
 .task-modal-label-item:hover {
   filter: brightness(1.15);
   transform: translateY(-1px);
+  opacity: 1 !important;
 }
 
 .task-modal-label-item:active {

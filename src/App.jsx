@@ -106,7 +106,14 @@ function App() {
     setCurrLabels((prev) => {
       const { [id]: removed, ...rest } = prev;
       if (removed) {
-        setInputText((txt) => txt.replace(`@[${removed}](${id})`, ''));
+        setInputText((txt) =>
+          txt
+            .replace(
+              new RegExp(`\\s*@\\[${removed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]\\(${id}\\)`),
+              ''
+            )
+            .trim()
+        );
       }
       return rest;
     });
@@ -233,7 +240,7 @@ function App() {
       addCurrLabel(label.id, label.display);
       setInputText((prev) => {
         const token = `@[${label.display}](${label.id})`;
-        return prev.includes(token) ? prev : `${prev} ${token}`.trim();
+        return prev.includes(token) ? prev : `${prev.trim()} ${token}`.trim();
       });
     }
   };
@@ -327,25 +334,24 @@ function App() {
 
   return (
     <div className="app-root">
-      <div className="toolbar">
-        <Header hideKanbieText={settings?.hideKanbieText} />
-        {loaded && (
-          <ActionButtons
-            theme={theme}
-            onClearAllDone={onDeleteAllDone}
-            onToggleInput={() => setInputExpanded((prev) => !prev)}
-            onToggleLabels={() => setLabelsListExpanded((prev) => !prev)}
-            onOpenSettings={() => setShowSettings(true)}
-            inputExpanded={inputExpanded}
-            labelsListExpanded={labelsListExpanded}
-            showSettings={showSettings}
-          />
-        )}
-      </div>
+      {loaded ? (
+        <DragDropContext onDragStart={handleDragStart} onDragEnd={onDragEnd}>
+          <div className="toolbar">
+            <Header hideKanbieText={settings?.hideKanbieText} />
+            <TrashDroppable theme={theme} isDragging={isDragging} />
+            <ActionButtons
+              theme={theme}
+              onClearAllDone={onDeleteAllDone}
+              onToggleInput={() => setInputExpanded((prev) => !prev)}
+              onToggleLabels={() => setLabelsListExpanded((prev) => !prev)}
+              onOpenSettings={() => setShowSettings(true)}
+              inputExpanded={inputExpanded}
+              labelsListExpanded={labelsListExpanded}
+              showSettings={showSettings}
+            />
+          </div>
 
-      {loaded && (
-        <div className="main-container">
-          <DragDropContext onDragStart={handleDragStart} onDragEnd={onDragEnd}>
+          <div className="main-container">
             {columns.map((column, colIndex) => (
               <Column
                 key={column.title}
@@ -366,8 +372,7 @@ function App() {
                 theme={theme}
               />
             ))}
-            <TrashDroppable theme={theme} isDragging={isDragging} />
-          </DragDropContext>
+          </div>
 
           {inputExpanded && (
             <TaskInputModal
@@ -415,6 +420,10 @@ function App() {
               theme={theme}
             />
           )}
+        </DragDropContext>
+      ) : (
+        <div className="toolbar">
+          <Header hideKanbieText={settings?.hideKanbieText} />
         </div>
       )}
     </div>

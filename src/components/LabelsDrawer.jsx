@@ -60,14 +60,14 @@ export function LabelsDrawer({ labels, setLabels, onClose, theme }) {
                 onClick={() => shiftLabelColor(label.id)}
                 title="Change color"
                 className="button-icon"
-                style={{ color: theme.accent, opacity: 0.7 }}
+                style={{ color: theme.accent, opacity: 0.8, paddingTop: "4px" }}
               />
               <CloseIcon
                 size={16}
                 onClick={() => deleteLabel(label.id)}
                 title="Delete label"
                 className="button-icon"
-                style={{ color: theme.delCol, opacity: 0.8 }}
+                style={{ color: theme.accent, opacity: 0.8 }}
               />
             </span>
           </div>

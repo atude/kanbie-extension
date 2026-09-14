@@ -5,6 +5,15 @@ export function Mention() {
   return null;
 }
 
+// Extract user-visible text by stripping @[display](id) mention tokens and preceding whitespace
+const extractVisibleText = (val) => {
+  return (val || '').replace(/\s*@\[([^\]]*)\]\(([^)]*)\)/g, '');
+};
+
+const extractMentionTokens = (val) => {
+  return (val || '').match(labelRegex) || [];
+};
+
 export function MentionsInput({
   value = '',
   onChange,
@@ -14,21 +23,64 @@ export function MentionsInput({
   autoFocus,
   children,
 }) {
+  const containerRef = useRef(null);
   const textareaRef = useRef(null);
   const listRef = useRef(null);
+  const activeTriggerRef = useRef(null);
+  const isKeyboardNavRef = useRef(false);
+  const lastMousePosRef = useRef({ x: 0, y: 0 });
+  const lastSentValueRef = useRef(value);
+
+  const [text, setText] = useState(() => extractVisibleText(value));
   const [isOpen, setIsOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeTriggerInfo, setActiveTriggerInfo] = useState(null);
 
-  // Extract user-visible text by stripping @[display](id) mention tokens
-  const visibleText = (value || '').replace(labelRegex, '');
+  // Sync text when value changes from outside
+  useEffect(() => {
+    if (value !== lastSentValueRef.current) {
+      lastSentValueRef.current = value;
+      const newText = extractVisibleText(value);
+      setText(newText);
+      if (autoFocus && textareaRef.current) {
+        setTimeout(() => {
+          if (textareaRef.current && document.activeElement === textareaRef.current) {
+            const currentLen = textareaRef.current.value.length;
+            textareaRef.current.setSelectionRange(currentLen, currentLen);
+          }
+        }, 0);
+      }
+    }
+  }, [value, autoFocus]);
 
   useEffect(() => {
     if (autoFocus && textareaRef.current) {
-      textareaRef.current.focus();
+      const el = textareaRef.current;
+      el.focus();
+      const len = el.value.length;
+      el.setSelectionRange(len, len);
+      const timer = setTimeout(() => {
+        if (document.activeElement === el) {
+          const currentLen = el.value.length;
+          el.setSelectionRange(currentLen, currentLen);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [autoFocus]);
+
+  // Close suggestions if user clicks outside MentionsInput
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   // Keep active suggestion visible while navigating with arrow keys
   useEffect(() => {
@@ -49,8 +101,8 @@ export function MentionsInput({
     for (const child of mentionConfigs) {
       const { trigger, data = [] } = child.props;
       const escaped = trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      // Match trigger preceded by start of text or whitespace
-      const match = textBeforeCursor.match(new RegExp('(?:^|\\s)(' + escaped + '[^\\s]*)$'));
+      // Match trigger preceded by start of text or whitespace (case-insensitive)
+      const match = textBeforeCursor.match(new RegExp('(?:^|\\s)(' + escaped + '[^\\s]*)$', 'i'));
 
       if (match) {
         const fullMatch = match[1];
@@ -63,14 +115,28 @@ export function MentionsInput({
         );
 
         if (filtered.length > 0) {
+          const isSameTrigger =
+            activeTriggerRef.current &&
+            activeTriggerRef.current.trigger === trigger &&
+            activeTriggerRef.current.start === matchStart &&
+            activeTriggerRef.current.query === query;
+
           setSuggestions(filtered);
-          setSelectedIndex(0);
-          setActiveTriggerInfo({
+          if (!isSameTrigger) {
+            setSelectedIndex(0);
+          } else {
+            setSelectedIndex((prev) => (prev >= filtered.length ? 0 : prev));
+          }
+
+          const newTriggerInfo = {
             child,
             trigger,
+            query,
             start: matchStart,
             end: matchEnd,
-          });
+          };
+          activeTriggerRef.current = newTriggerInfo;
+          setActiveTriggerInfo(newTriggerInfo);
           setIsOpen(true);
           return;
         }
@@ -78,38 +144,52 @@ export function MentionsInput({
     }
 
     setIsOpen(false);
+    activeTriggerRef.current = null;
     setActiveTriggerInfo(null);
     setSuggestions([]);
   };
 
   const handleInputChange = (e) => {
-    const newVisibleText = e.target.value;
+    const newText = e.target.value;
     const cursorPos = e.target.selectionStart;
 
-    // Retain all existing metadata mentions (e.g. @[display](id))
-    const existingMentions = (value || '').match(labelRegex) || [];
-    const newFullValue = existingMentions.length > 0
-      ? (newVisibleText + ' ' + existingMentions.join(' ')).trim()
-      : newVisibleText;
+    setText(newText);
 
+    // Retain all existing metadata mentions (e.g. @[display](id))
+    const existingMentions = extractMentionTokens(value);
+    const cleanText = newText.trimEnd();
+    const newFullValue = existingMentions.length > 0
+      ? (cleanText ? `${cleanText} ${existingMentions.join(' ')}` : existingMentions.join(' '))
+      : newText;
+
+    lastSentValueRef.current = newFullValue;
     if (onChange) {
       onChange({ target: { value: newFullValue } });
     }
 
-    checkTriggers(newVisibleText, cursorPos);
+    checkTriggers(newText, cursorPos);
   };
 
   const selectSuggestion = (item) => {
-    if (!activeTriggerInfo) return;
+    if (!activeTriggerInfo || !item) return;
 
     const { child, start, end } = activeTriggerInfo;
-    const textBefore = visibleText.slice(0, start);
-    const textAfter = visibleText.slice(end);
-    const rawClean = textBefore + textAfter;
-    const newVisibleText = rawClean.replace(/\s{2,}/g, ' ');
+    const textBefore = text.slice(0, start);
+    const textAfter = text.slice(end);
 
-    const existingMentions = (value || '').match(labelRegex) || [];
-    const isLabel = child.props.trigger === '#';
+    let newCleanText = (textBefore + textAfter).replace(/\s{2,}/g, ' ');
+    if (start === 0) {
+      newCleanText = newCleanText.trimStart();
+    }
+    if (end >= text.length) {
+      newCleanText = newCleanText.trimEnd();
+    }
+
+    const isLabel =
+      child.props.isLabel ??
+      (child.props.trigger === '#' || child.props.trigger.toLowerCase() === 'l:');
+
+    const existingMentions = extractMentionTokens(value);
     const updatedMentions = [...existingMentions];
 
     if (isLabel) {
@@ -119,9 +199,13 @@ export function MentionsInput({
       }
     }
 
+    const cleanText = newCleanText.trimEnd();
     const newFullValue = updatedMentions.length > 0
-      ? (newVisibleText + ' ' + updatedMentions.join(' ')).trim()
-      : newVisibleText;
+      ? (cleanText ? `${cleanText} ${updatedMentions.join(' ')}` : updatedMentions.join(' '))
+      : newCleanText;
+
+    setText(newCleanText);
+    lastSentValueRef.current = newFullValue;
 
     if (child.props.onAdd) {
       child.props.onAdd(item.id, item.display);
@@ -132,12 +216,13 @@ export function MentionsInput({
     }
 
     setIsOpen(false);
+    activeTriggerRef.current = null;
     setActiveTriggerInfo(null);
     setSuggestions([]);
 
     if (textareaRef.current) {
       textareaRef.current.focus();
-      const nextPos = textBefore.length;
+      const nextPos = Math.min(start, newCleanText.length);
       setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.setSelectionRange(nextPos, nextPos);
@@ -150,22 +235,30 @@ export function MentionsInput({
     if (isOpen && suggestions.length > 0) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
+        isKeyboardNavRef.current = true;
         setSelectedIndex((prev) => (prev + 1) % suggestions.length);
         return;
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
+        isKeyboardNavRef.current = true;
         setSelectedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
         return;
       }
       if (e.key === 'Enter' || e.key === 'Tab') {
         e.preventDefault();
         e.stopPropagation();
-        selectSuggestion(suggestions[selectedIndex]);
+        if (suggestions[selectedIndex]) {
+          selectSuggestion(suggestions[selectedIndex]);
+        }
         return;
       }
       if (e.key === 'Escape') {
         e.preventDefault();
+        e.stopPropagation();
+        if (e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+          e.nativeEvent.stopImmediatePropagation();
+        }
         setIsOpen(false);
         return;
       }
@@ -186,15 +279,42 @@ export function MentionsInput({
     }
   };
 
+  const handleKeyUp = (e) => {
+    if (
+      ['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta'].includes(e.key)
+    ) {
+      return;
+    }
+    handleCursorCheck();
+  };
+
+  const handleMouseMove = (e) => {
+    if (
+      e.clientX !== lastMousePosRef.current.x ||
+      e.clientY !== lastMousePosRef.current.y
+    ) {
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+      isKeyboardNavRef.current = false;
+    }
+  };
+
   return (
-    <div className={`mentions ${className} mentions__control`} style={{ position: 'relative' }}>
+    <div
+      ref={containerRef}
+      className={`mentions ${className} mentions__control`}
+      style={{ position: 'relative' }}
+    >
       <textarea
         ref={textareaRef}
         className="mentions__input"
-        value={visibleText}
+        value={text}
         onChange={handleInputChange}
+        onFocus={(e) => {
+          const len = e.target.value.length;
+          e.target.setSelectionRange(len, len);
+        }}
         onKeyDown={handleKeyDown}
-        onKeyUp={handleCursorCheck}
+        onKeyUp={handleKeyUp}
         onClick={handleCursorCheck}
         placeholder={placeholder}
         style={{
@@ -209,6 +329,7 @@ export function MentionsInput({
       {isOpen && suggestions.length > 0 && (
         <div
           className="mentions__suggestions"
+          onMouseMove={handleMouseMove}
           style={{
             position: 'absolute',
             top: '100%',
@@ -234,7 +355,11 @@ export function MentionsInput({
                   e.preventDefault();
                   selectSuggestion(item);
                 }}
-                onMouseEnter={() => setSelectedIndex(idx)}
+                onMouseEnter={() => {
+                  if (!isKeyboardNavRef.current) {
+                    setSelectedIndex(idx);
+                  }
+                }}
                 style={{
                   cursor: 'pointer',
                   display: 'flex',
