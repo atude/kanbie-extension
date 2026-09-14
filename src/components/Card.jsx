@@ -30,7 +30,6 @@ export function Card({
   const cardLabels = [];
   if (filteredLabels && labels) {
     const seen = new Set();
-    for (const match of filteredLabels) {
     for (const match of [...filteredLabels].reverse()) {
       const labelId = match.replace(labelRegex, '$2');
       if (!seen.has(labelId)) {
