@@ -266,7 +266,7 @@ export function TaskInputModal({
                     onClick={clearCurrAlarm}
                     title="Clear alarm"
                   >
-                    <CloseCircleIcon size={14} />
+                    <CloseCircleIcon size={20} />
                     <span>Clear</span>
                   </button>
                 )}
