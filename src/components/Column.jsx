@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import OutsideClickHandler from 'react-outside-click-handler';
@@ -127,23 +127,6 @@ export function Column({
             )}
           </div>
 
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            className="droppable-container column-container"
-          >
-            {column.items.map((item, i) => (
-              <Card
-                key={item.id}
-                item={item}
-                index={i}
-                onStartEditing={onStartEditingCard}
-                labels={labels}
-                alarms={alarms}
-                theme={theme}
-              />
-            ))}
-            {provided.placeholder}
           <div className="column-content-wrapper">
             <div
               {...provided.droppableProps}
