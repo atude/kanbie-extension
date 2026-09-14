@@ -3,6 +3,16 @@ import { Draggable } from '@hello-pangea/dnd';
 import BellRingIcon from 'mdi-react/BellRingIcon';
 import moment from 'moment';
 import { labelRegex } from '../utils/generic';
+import { colorPanelColors, colorPanelColorsHighlight } from '../constants/Colors';
+
+const getLabelHighlightColor = (labelColor) => {
+  if (!labelColor) return null;
+  const index = colorPanelColors.indexOf(labelColor);
+  if (index !== -1 && colorPanelColorsHighlight[index]) {
+    return colorPanelColorsHighlight[index];
+  }
+  return labelColor;
+};
 
 export function Card({
   item,
@@ -16,6 +26,21 @@ export function Card({
   const filteredLabels = item.content.match(labelRegex);
   const cardAlarm = alarms[item.id];
   const dueTime = cardAlarm ? moment(cardAlarm.alarmDue) : null;
+
+  const cardLabels = [];
+  if (filteredLabels && labels) {
+    const seen = new Set();
+    for (const match of filteredLabels) {
+      const labelId = match.replace(labelRegex, '$2');
+      if (!seen.has(labelId)) {
+        seen.add(labelId);
+        const matched = labels.find((label) => label.id === labelId);
+        if (matched) {
+          cardLabels.push(matched);
+        }
+      }
+    }
+  }
 
   return (
     <Draggable key={item.id} draggableId={item.id} index={index}>
@@ -32,6 +57,20 @@ export function Card({
           className="draggable-card"
           onDoubleClick={() => onStartEditing(item)}
         >
+          {cardLabels.length > 0 && (
+            <div className="card-label-indicator">
+              {cardLabels.map((label) => (
+                <div
+                  key={label.id}
+                  className="card-label-indicator-segment"
+                  style={{
+                    backgroundColor: getLabelHighlightColor(label.color) || theme.accentColoredBright,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
           <div className="card-text">{item.content.replace(labelRegex, '')}</div>
 
           {filteredLabels && (
