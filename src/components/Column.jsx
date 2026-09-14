@@ -1,4 +1,3 @@
-// import React from 'react';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import OutsideClickHandler from 'react-outside-click-handler';

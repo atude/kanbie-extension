@@ -268,7 +268,6 @@ textarea,
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-y: overlay;
   overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -280,14 +279,11 @@ textarea,
 }
 
 .column-wrapper .column-container::-webkit-scrollbar {
-  width: 2px;
   display: none;
   width: 0;
   height: 0;
 }
 
-.column-wrapper .column-container::-webkit-scrollbar-track {
-  background: transparent;
 /* --- Column Overlay Scrollbar --- */
 .column-scrollbar-track {
   position: absolute;
@@ -299,8 +295,6 @@ textarea,
   z-index: 5;
 }
 
-.column-wrapper .column-container::-webkit-scrollbar-thumb {
-  background: var(--bg3);
 .column-scrollbar-thumb {
   position: absolute;
   right: 3px;
@@ -311,8 +305,6 @@ textarea,
   transition: background-color 0.15s ease;
 }
 
-.column-wrapper .column-container::-webkit-scrollbar-thumb:hover {
-  background: var(--accentColored);
 .column-scrollbar-thumb:hover,
 .column-scrollbar-thumb:active {
   background-color: var(--accentColoredBright);
