@@ -52,9 +52,6 @@ function App() {
     removeAlarm,
   } = useKanbanAlarms();
 
-	const suppressResize = (e) => {
-		e.stopImmediatePropagation();
-	};
 
   // Load initial data from Chrome sync storage
   useEffect(() => {
@@ -147,15 +144,10 @@ function App() {
   // Drag and drop handler
   const handleDragStart = () => {
     setIsDragging(true);
-		// Chrome M152+ fires spurious resize events during DOM mutations in
-		// extension popups. @hello-pangea/dnd cancels any active drag on
-		// window resize, so we suppress resize events while dragging.
-		window.addEventListener('resize', suppressResize, true);
   };
 
   const onDragEnd = (result) => {
     setIsDragging(false);
-		window.removeEventListener('resize', suppressResize, true);
 
     const { source, destination } = result;
     if (!destination) return;

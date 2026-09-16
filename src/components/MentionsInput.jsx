@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, Children } from 'react';
 import { labelRegex } from '../utils/generic';
+import { matchSorter } from 'match-sorter';
 
 export function Mention() {
   return null;
@@ -110,9 +111,9 @@ export function MentionsInput({
         const matchStart = match.index + (match[0].length - fullMatch.length);
         const matchEnd = cursorPos;
 
-        const filtered = data.filter((item) =>
-          (item.display || '').toLowerCase().includes(query.toLowerCase())
-        );
+				const filtered = query.trim()
+					? matchSorter(data, query, { keys: ['display'] })
+					: data;
 
         if (filtered.length > 0) {
           const isSameTrigger =

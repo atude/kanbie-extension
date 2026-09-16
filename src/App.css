@@ -214,7 +214,7 @@ textarea,
   text-transform: uppercase;
   letter-spacing: 0.6px;
   border: 1px solid var(--accentColoredDark);
-  box-shadow: 0 0 0 3px rgba(237, 57, 201, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accentColoredDark), black 20%); ;
   background-color: var(--bg1);
   border-radius: 6px;
   outline: none;
@@ -561,7 +561,7 @@ textarea,
 
 .task-modal-textarea:focus-within {
   border-color: var(--accentColoredBright) !important;
-  box-shadow: 0 0 0 2px rgba(237, 57, 201, 0.18) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accentColoredDark), black 20%) !important;
 }
 
 .task-modal-textarea textarea,
@@ -643,7 +643,6 @@ textarea,
 
 .task-modal-clear-alarm-btn:hover {
   opacity: 0.8;
-  background-color: rgba(255, 60, 60, 0.1);
 }
 
 .task-modal-alarm-pill {
@@ -738,7 +737,7 @@ textarea,
   gap: 5px;
   align-content: flex-start;
   min-height: 40px;
-  max-height: 80px;
+  max-height: 120px;
   overflow-y: auto;
   padding: 6px;
 }
@@ -767,7 +766,7 @@ textarea,
 }
 
 .task-modal-label-item:hover {
-  filter: brightness(1.15);
+  /* filter: brightness(1.15); */
   transform: translateY(-1px);
   opacity: 1 !important;
 }
@@ -954,7 +953,7 @@ textarea,
 .task-modal-btn-primary {
   background-color: var(--accentColoredBright);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(237, 57, 201, 0.3);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accentColoredDark), black 20%);;
 }
 
 .task-modal-btn-primary:hover:not(:disabled) {

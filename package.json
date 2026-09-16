@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
+    "match-sorter": "^8.3.0",
     "mdi-react": "^9.4.0",
     "moment": "^2.30.1",
     "react": "^19.0.0",

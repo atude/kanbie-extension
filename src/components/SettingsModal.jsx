@@ -56,7 +56,7 @@ export function SettingsModal({ settings, setSettings, onClose, theme }) {
             <span><i>double click</i></span>
           </div>
           <div className="shortcut-item">
-            <span>Close modal / cancel editing</span>
+            <span>Cancel editing</span>
             <span><i>esc</i></span>
           </div>
         </div>

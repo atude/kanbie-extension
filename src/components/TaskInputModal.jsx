@@ -458,7 +458,7 @@ export function TaskInputModal({
               </button>
             ) : (
               <span className="task-modal-shortcut-tip">
-                Press <b>Enter</b> to {isEditing ? 'save' : 'create'} task &bull; <b>Shift + Enter</b> for new line
+                Press <b>Enter</b> to {isEditing ? 'save' : 'create'} task
               </span>
             )}
           </div>

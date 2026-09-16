@@ -10,12 +10,12 @@ export const updateBadge = (alarms) => {
 			(totalNotified, currAlarm) => totalNotified += moment(currAlarm.alarmDue).isBefore() ? 1 : 0, 0
 		);
 		if (totalDueTasks > 0) {
-			// chrome.action.setBadgeText({ text: totalDueTasks.toString() });
-		// 	chrome.action.setBadgeBackgroundColor({ 
-		// 		color: badge.color,
-		// 	});
-		// } else {
-		// 	chrome.action.setBadgeText({ text: "" });
+			chrome.action.setBadgeText({ text: totalDueTasks.toString() });
+			chrome.action.setBadgeBackgroundColor({ 
+				color: badge.color,
+			});
+		} else {
+			chrome.action.setBadgeText({ text: "" });
 		}
 	}
 };
