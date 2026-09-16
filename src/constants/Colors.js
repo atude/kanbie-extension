@@ -10,6 +10,18 @@ export const colorPanelColors = [
   "#ff303055",
 ];
 
+export const colorPanelColorsHighlight = [
+  "#666666ff",
+  "#ff66f0ff",
+  "#b055ffff",
+  "#4da6ffff",
+  "#68ffe7ff",
+  "#66ff80ff",
+  "#ffdb4dff",
+  "#ffa866ff",
+  "#ff6666ff",
+];
+
 export const badge = {
 	color: "#cc2727",
 };
