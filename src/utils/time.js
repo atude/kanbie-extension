@@ -29,9 +29,10 @@ const times = timeHours.flatMap(timeHour =>
 	timeMins.map((timeMin) => `${timeHour}:${timeMin.toString().length === 1 ? `${timeMin}0` : timeMin }`)
 );
 
-export const allTimes = formatTimeToMention(
-	times.flatMap(time => ["AM", "PM"].map((amOrPm) => `${time}${amOrPm}`))
-);
+export const allTimes = formatTimeToMention([
+  ...times.map(time => `${time}AM`),
+  ...times.map(time => `${time}PM`),
+]);
 
 export const allDays = [
 	{ id: `__DATE: ${moment().add(0, 'days').format("DD/MM/YYYY")}`, display: "Today" },
